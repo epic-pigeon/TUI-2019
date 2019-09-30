@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import Problem_1.MapView?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="Problem_1.MapWindowController"
+          alignment="center" hgap="10" vgap="10">
+    <MapView fx:id="mapView"/>
+</GridPane>
