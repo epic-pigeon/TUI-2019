@@ -363,13 +363,15 @@ public class Controller implements Initializable {
                                 )
                         );
                     } else {
-                        controller.getMapView().beginPath();
-                        controller.getMapView().moveTo(realCoords);
-                        controller.getMapView().arcPathPixel(
-                                controller.getMapView().unitCoordsToPixels(realCoords),
-                                10, 0,2 * Math.PI);
-                        controller.getMapView().closePath();
-                        controller.getMapView().fillPath();
+                        if (i != route.length - 1) {
+                            controller.getMapView().beginPath();
+                            controller.getMapView().moveTo(realCoords);
+                            controller.getMapView().arcPathPixel(
+                                    controller.getMapView().unitCoordsToPixels(realCoords),
+                                    10, 0, 2 * Math.PI);
+                            controller.getMapView().closePath();
+                            controller.getMapView().fillPath();
+                        }
 
                         double deltaX = (realCoords.getX() - prevCoords.getX());
                         double deltaY = (realCoords.getY() - prevCoords.getY());
