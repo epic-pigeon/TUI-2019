@@ -24,7 +24,7 @@ public class Controller implements Initializable {
 
     }
 
-    public  static void createMapWindow(
+    public static void createMapWindow(
         double focusDistance,
         double photoCensorHeight,
         double photoCensorWidth,
@@ -32,12 +32,33 @@ public class Controller implements Initializable {
         double fieldHeight,
         double fieldWidth,
         MapView.LatLng southWest,
-        double diameter
+        double diameter,
+        double chargePerPhoto,
+        double chargePerMeter,
+        double possibleCharge
     ) {
         double[] a = calculate(focusDistance, photoCensorHeight, photoCensorWidth, height);
         invokeMapWindow(
-                calculateRoute(a[0], a[1], fieldHeight, fieldWidth), fieldHeight, fieldWidth, southWest, diameter
+                calculateRoute(a[0], a[1], fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge), fieldHeight, fieldWidth, southWest, diameter
         );
+    }
+
+    public static double calculateCharge(double[][] route, double chargePerPhoto, double chargePerMeter) {
+        double[] prev = route[0];
+        double result = 0;
+        for (int i = 1; i < route.length; i++) {
+            result += chargePerPhoto;
+            result += chargePerMeter * Math.sqrt(
+                    sqr(route[i][1] - prev[1]) +
+                    sqr(route[i][0] - prev[0])
+            );
+            prev = route[i];
+        }
+        return result;
+    }
+
+    private static double sqr(double q) {
+        return q * q;
     }
 
 
@@ -50,7 +71,7 @@ public class Controller implements Initializable {
         return new double[] {groundHeight, groundWidth};
     }
 
-    public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth) {
+    public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
         RouteCalculator routeCalculator = new RouteCalculator(photoHeight, photoWidth, fieldHeight, fieldWidth);
         int h = routeCalculator.getHeight();
         int w = routeCalculator.getWidth();
@@ -119,7 +140,18 @@ public class Controller implements Initializable {
             }
         }
 
-        return invert ? invertCoords(routeCalculator.getRoute()) : routeCalculator.getRoute();
+
+        double[][] result =  invert ? invertCoords(routeCalculator.getRoute()) : routeCalculator.getRoute();
+        if (calculateCharge(result, chargePerPhoto, chargePerMeter) <= possibleCharge) {
+            return result;
+        } else {
+            if (!invert ? h > w : w > h) {
+                fieldHeight -= photoHeight;
+            } else {
+                fieldWidth -= photoWidth;
+            }
+            return calculateRoute(photoHeight, photoWidth, fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge);
+        }
     }
 
     private static double[][] invertCoords(double[][] route) {

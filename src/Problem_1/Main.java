@@ -43,11 +43,14 @@ public class Main extends Application {
         labels.add(new Label("Enter field latitude"));
         labels.add(new Label("Enter field longitude"));
         labels.add(new Label("Enter field diagonal"));
+        labels.add(new Label("Charge per photo"));
+        labels.add(new Label("Charge per meter"));
+        labels.add(new Label("Max energy"));
 
         vbox = new VBox(vgap);
         vbox.setPadding(new Insets(10 ,10 ,10 ,10));
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 12; i++) {
             TextField temp = new TextField();
             if (i == 6) temp.setText("50.467977");
             if (i == 7) temp.setText("31.211438");
@@ -82,7 +85,10 @@ public class Main extends Application {
                                 Float.valueOf(textFields.get(7).getText())
                                 ),
                         //new MapView.LatLng(50.466977, 31.211438), 0.01
-                       Float.valueOf(textFields.get(8).getText())
+                        Float.valueOf(textFields.get(8).getText()),
+                        Float.valueOf(textFields.get(9).getText()),
+                        Float.valueOf(textFields.get(10).getText()),
+                        Float.valueOf(textFields.get(11).getText())
                );
                /*double[] photoBounds = Controller.calculate(
                        Float.valueOf(textFields.get(0).getText()),
