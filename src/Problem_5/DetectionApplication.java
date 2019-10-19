@@ -76,13 +76,13 @@ public class DetectionApplication extends Application {
         }});
 
         buttonPhotos.setOnAction(event -> {if (mainFile != null) {
-                if (fl) {
-                    imageView.setImage(new Image(mainFile.toURI().toString()));
-                } else {
-                    File file3 = new File("src/Useful.sample/analyzingPhoto.JPG");
-                    imageView.setImage(new Image(file3.toURI().toString()));
-                }
-                fl = !fl;
+            if (fl) {
+                imageView.setImage(new Image(mainFile.toURI().toString()));
+            } else {
+                File file3 = new File("src/Problem_5/analyzingPhoto.JPG");
+                imageView.setImage(new Image(file3.toURI().toString()));
+            }
+            fl = !fl;
         }});
 
         primaryStage.setTitle("Application");

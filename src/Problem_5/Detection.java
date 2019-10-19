@@ -22,8 +22,15 @@ import java.net.URI;
 import java.util.ArrayList;
 
 public class Detection {
-    private static final String key1 = "39b989a4434c4b1198a4ef1f49550928";
+    private static final String key1 = "c481d76545e74a14b3914092fcece70b";
     private static final String key2 = "0e1bbf08e0b04d86bdea106e0110a766";
+
+    private static ArrayList<ArrayList<String>> objects = new ArrayList<>();
+    private static ArrayList<String> runObj = new ArrayList<String>(){{
+        add("car");
+        add("mammal");
+        add("person");
+    }};
 
     public Detection() {
     }
@@ -54,15 +61,19 @@ public class Detection {
                 Image image = new Image(file.toURI().toString());
                 BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
                 ArrayList<ArrayList<String>> array = getResults(EntityUtils.toString(entity));
-               // ArrayList<Pair<String, Color>> tag_color = new ArrayList<>();
+                // ArrayList<Pair<String, Color>> tag_color = new ArrayList<>();
                 ArrayList<String> tags = new ArrayList<>();
                 ArrayList<Color> colors = new ArrayList<Color>(){{
                     add(Color.RED);
                     add(Color.GREEN);
-                    add(Color.CYAN);
+                    add(Color.yellow);
                     add(Color.orange);
                     add(Color.magenta);
                 }};
+                ArrayList<String> obj = new ArrayList<>();
+                ArrayList<String> arrayListCopy = new ArrayList<>();
+                if (!objects.isEmpty())
+                    arrayListCopy.addAll(objects.get(objects.size() - 1));
                 for (ArrayList<String> kar : array) {
                     String i = kar.get(1);
                     int x, y, w, h;
@@ -70,9 +81,23 @@ public class Detection {
                     x = Integer.valueOf(i.substring(i.indexOf(",\"x\"") + 5, i.indexOf(",\"h\"")));
                     h = Integer.valueOf(i.substring(i.indexOf(",\"h\"") + 5, i.indexOf(",\"y\"")));
                     y = Integer.valueOf(i.substring(i.indexOf(",\"y\"") + 5, i.length() - 1));
-                    System.out.println(i + " " + w + " " + x + " " + h + " " + y);
+                  //  System.out.println(i + " " + w + " " + x + " " + h + " " + y);
                     Graphics graphics = bufferedImage.getGraphics();
-                    System.out.println(kar.get(0));
+                  //  System.out.println(kar.get(0));
+
+                    obj.add(kar.get(0));
+                    String s = "";
+                    if (objects.isEmpty()){
+                        s = "new object";
+                    }else if (arrayListCopy.indexOf(kar.get(0)) != -1){
+                        arrayListCopy.remove(arrayListCopy.indexOf(kar.get(0)));
+                    }else{
+                        s = "new object";
+                    }
+                    if (runObj.indexOf(kar.get(0)) != -1){
+                        s += "\n moving";
+                    }
+
                     if (tags.indexOf(kar.get(0)) == -1){
                         graphics.setColor(colors.get(tags.size() % colors.size()));
                         tags.add(kar.get(0));
@@ -92,8 +117,7 @@ public class Detection {
                         //g2.setFont(new Font("TimesRoman", Font.PLAIN, 150));
                         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
-
-                        g2.drawString(kar.get(0), x, y + h);// + graphics.getFont().getSize());
+                        g2.drawString((kar.get(0) + " " + s), x, y + h);// + graphics.getFont().getSize());
                     }
                     /*
                     for (int j = x; j < x + w; ++j) {
@@ -105,6 +129,9 @@ public class Detection {
                       bufferedImage.setRGB(x + w - 1, j, Color.RED.getRGB());
                      }*/
                 }
+                System.out.println(obj);
+                objects.add(obj);
+
                 return bufferedImage;
             }
         } catch (Exception e) {
@@ -114,7 +141,7 @@ public class Detection {
     }
 
     public ArrayList<ArrayList<String>> getResults(String result) throws JSONException {
-        //     System.out.println(result);
+             System.out.println(result);
         JSONObject jsonObj = new JSONObject(result);
         if (!jsonObj.has("objects")) {
             return new ArrayList<>(new ArrayList<>());

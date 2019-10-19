@@ -15,7 +15,7 @@ import java.net.URI;
 
 public class DetectionMain {
 
-    private static final String key1 = "39b989a4434c4b1198a4ef1f49550928";
+    private static final String key1 = "86b7792c47284d0b88a48106bbd3d2e2";
     private static final String key2 = "0e1bbf08e0b04d86bdea106e0110a766";
 
 

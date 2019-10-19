@@ -145,19 +145,19 @@ public class Denoise {
     }
 
     //ЮЗАЙ ЭТОТ TODO
-    public BufferedImage Denoise2(File[] inputFiles, int difference) throws IOException {
-        Image[] images = new Image[inputFiles.length];
+    public BufferedImage Denoise2(ArrayList<File> inputFiles, int difference) throws IOException {
+        Image[] images = new Image[inputFiles.size()];
 
-        for (int i = 0; i < inputFiles.length; ++i) {
-            images[i] = new Image(inputFiles[i].toURI().toString());
+        for (int i = 0; i < inputFiles.size(); ++i) {
+            images[i] = new Image(inputFiles.get(i).toURI().toString());
         }
 
         BufferedImage output = SwingFXUtils.fromFXImage(images[0], null);
 
         for (int i = 0; i < output.getHeight(); ++i) {
             for (int j = 0; j < output.getWidth(); ++j) {
-                int[] data = new int[inputFiles.length];
-                for (int kar = 0; kar < inputFiles.length; ++kar) {
+                int[] data = new int[inputFiles.size()];
+                for (int kar = 0; kar < inputFiles.size(); ++kar) {
                     javafx.scene.paint.Color color = images[kar].getPixelReader().getColor(j, i);
                     data[kar] = new Color((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue(), (float) color.getOpacity()).getRGB();
                 }

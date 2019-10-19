@@ -9,15 +9,21 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -47,10 +53,14 @@ public class SortImage implements Initializable {
     private MenuItem run;
     @FXML
     private MenuItem runAuto;
+    @FXML
+    private MenuItem param;
 
     public static ArrayList<File> inputFiles = new ArrayList<>();
 
     private int currentElem = 0;
+
+    private static double delay = 1500;
 
     private final FileChooser fileChooser = new FileChooser();
 
@@ -58,7 +68,7 @@ public class SortImage implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //Подготовил FileChooser для загрузки файлов, установив фильры
         fileChooser.setTitle("Select Files");
-        fileChooser.setInitialDirectory(new File("C:/Users/Tony/Desktop/TUI-2019(2)"));
+        fileChooser.setInitialDirectory(new File("C:/Users"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
 
         Parent node = null;
@@ -93,6 +103,39 @@ public class SortImage implements Initializable {
         addFiles.setOnAction(event -> FilesUIController.uploadFilesAndUpdate(true));
         run.setOnAction(event -> startPlay());
         runAuto.setOnAction(event -> startPlayWith());
+        param.setOnAction(event -> setParam());
+    }
+
+    private void setParam(){
+        Stage dialog = new Stage();
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(10 ,10 ,10 ,10));
+        TextField temp = new TextField();
+        temp.addEventFilter(KeyEvent.KEY_TYPED, keyEvent -> {
+            try {
+                Integer.valueOf(temp.getText() + keyEvent.getCharacter());
+            }catch (Exception e){
+                keyEvent.consume();
+            }
+        });
+        Button okBtn = new Button("OK");
+        okBtn.setOnAction(event -> {
+            try {
+                if (Integer.valueOf(temp.getText()) > 0){
+                    delay = Integer.valueOf(temp.getText());
+                    dialog.close();
+                }
+            }catch (Exception e){
+            }
+        });
+
+        okBtn.setPrefWidth(200);
+        root.getChildren().addAll(temp, okBtn);
+        dialog.initOwner(anchor.getScene().getWindow());
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setScene(new Scene(root , 200 , 100));
+        dialog.setTitle("Введите задержку!");
+        dialog.showAndWait();
     }
 
     //TODO : проверка , что все входящие файлы ТОЛЬКО фото
@@ -147,7 +190,7 @@ public class SortImage implements Initializable {
             for (File file : inputFiles) {
                 KeyFrame frame = new KeyFrame(totalDelay, e -> mainFrameImageView.setImage(new Image(file.toURI().toString(), (800 * 4032) / 3024, 800, true, true, true)));
                 timeline.getKeyFrames().add(frame);
-                totalDelay = totalDelay.add(new Duration(1500));
+                totalDelay = totalDelay.add(new Duration(delay));
             }
             timeline.play();
 
