@@ -30,7 +30,7 @@ public class Main extends Application {
 
 
         //launch(args);
-        File[] input = {
+     /*   File[] input = {
                 new File("src/Useful.sample/result/banana_two.jpg"),
                 new File("src/Useful.sample/result/banana_three.jpg"),
                 new File("src/Useful.sample/result/banana_one.jpg"),
@@ -88,7 +88,7 @@ public class Main extends Application {
         //File outputfile = new File("src/Useful.sample/result/result_finish.jpg");
         File outputfile = new File("src/Useful.sample/result/banana_test2.jpg");
         ImageIO.write(image, "jpg", outputfile);
-        System.out.println("finish");
+        System.out.println("finish");*/
         launch(args);
         /*File jpegFile = new File("src/image.JPG");//"C:\\Users\\Tony\\Desktop\\2016_0101_002343_136.JPG");
         Metadata metadata = ImageMetadataReader.readMetadata(jpegFile);
