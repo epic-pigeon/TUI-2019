@@ -152,9 +152,8 @@ public class TLogParser {
 
     private static File generateTxt(File tlog, String filename) throws IOException, InterruptedException {
         File result = new File("./" + filename);
-
         new ProcessBuilder("./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start().waitFor();
-
+        result.deleteOnExit();
         return result;
     }
 
