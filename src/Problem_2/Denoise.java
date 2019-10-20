@@ -2,6 +2,7 @@ package Problem_2;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -12,10 +13,9 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
+
+import org.opencv.imgproc.Imgproc;
 
 public class Denoise {
 
@@ -281,5 +281,55 @@ public class Denoise {
         return output;
     }
 
+    public BufferedImage Denoise(ArrayList<File> inputFiles) throws IOException {
+        Date time = new Date();
+        Image[] images = new Image[inputFiles.size()];
+        //init images
+        for (int i = 0; i < inputFiles.size(); ++i) {
+            images[i] = new Image(inputFiles.get(i).toURI().toString());
+        }
+        final int pieceSize = 5;
 
+        BufferedImage output = SwingFXUtils.fromFXImage(images[0], null);
+        for (int j = 0; j < Math.pow(output.getWidth()/pieceSize, 2); j++) {
+            javafx.scene.paint.Color[][][] arr = new javafx.scene.paint.Color[inputFiles.size()][pieceSize][pieceSize];
+            for (int i = 0; i < inputFiles.size(); i++) {
+                for (int k = 0; k < pieceSize; k++) {
+                    for (int l = 0; l < pieceSize; l++) {
+                        arr[i][k][l] = images[i].getPixelReader().getColor((j%(output.getWidth()/pieceSize))*pieceSize + l, k + (pieceSize*j/output.getWidth())*pieceSize);
+                    }
+                }
+            }
+            int index = getIndex(arr);
+            int red, green, blue;
+            for (int k = 0; k < pieceSize; k++) {
+                for (int l = 0; l < pieceSize; l++) {
+                    red = (int)(arr[index][k][l].getRed() * 255);
+                    green = (int)(arr[index][k][l].getGreen() * 255);
+                    blue = (int)(arr[index][k][l].getBlue() * 255);
+                    output.setRGB((j%(output.getWidth()/pieceSize))*pieceSize + l, k + (pieceSize*j/output.getWidth())*pieceSize, getIntFromColor(red, green,blue));
+                }
+            }
+        }
+        System.out.println(((double)(new Date().getTime() - time.getTime()))/1000.000);
+        return output;
+    }
+
+    protected int getIndex(javafx.scene.paint.Color[][][] arr){
+        int res = 0;
+
+        return res;
+    }
+
+    protected double getY(javafx.scene.paint.Color color){
+        return color.getGreen() + color.getBlue() + color.getRed();
+    }
+
+    public int getIntFromColor(int Red, int Green, int Blue){
+        Red = (Red << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
+        Green = (Green << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
+        Blue = Blue & 0x000000FF; //Mask out anything not blue.
+
+        return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
+    }
 }

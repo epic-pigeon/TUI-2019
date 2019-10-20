@@ -14,18 +14,6 @@ public class CanvasFX extends Application {
         Application.launch(args);
     }
 
-    private void rotate(GraphicsContext gc, double angle, double px, double py) {
-        Rotate r = new Rotate(angle, px, py);
-        gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-    }
-
-    private void drawRotatedImage(GraphicsContext gc, Image image, double angle, double tlpx, double tlpy) {
-        gc.save(); // saves the current state on stack, including the current transform
-        rotate(gc, angle, tlpx + image.getWidth() / 2, tlpy + image.getHeight() / 2);
-        gc.drawImage(image, tlpx, tlpy);
-        gc.restore(); // back to original state (before rotation)
-    }
-
     @Override
     public void start(Stage stage) {
         Canvas canvas = new Canvas(1800, 800);
@@ -43,7 +31,7 @@ public class CanvasFX extends Application {
       //  gc.drawImage(image, 220, 50, 100, 70);
 
         for (int i = 0; i < 10; ++i) {
-            r = new Rotate(i * 30, 50 + i*50, 35 + i*50);
+            r = new Rotate(i * 15, 50 + i*50, 35 + i*50);
             gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
             gc.drawImage(image, i*50, i*50, 100, 70);
         }
