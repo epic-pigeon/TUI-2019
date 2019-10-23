@@ -1,11 +1,10 @@
 package Problem_4;
 
-import com.sun.org.apache.xalan.internal.xslt.Process;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.management.ManagementFactory;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.*;
 
 public class TLogParser {
     public static class TLogEntry {
@@ -19,7 +18,7 @@ public class TLogParser {
     }
 
     public static class TLogPoint {
-        private long unixTime;
+        private long unixTime, imgId;
         private double latitude, longitude, yaw, altitude;
 
         public long getUnixTime() {
@@ -46,6 +45,7 @@ public class TLogParser {
         public String toString() {
             return "TLogPoint{" +
                     "unixTime=" + unixTime +
+                    ", imgId=" + imgId +
                     ", latitude=" + latitude +
                     ", longitude=" + longitude +
                     ", yaw=" + yaw +
@@ -82,6 +82,7 @@ public class TLogParser {
         private static String MAVLINK_LONGITUDE = "lon_._mavlink_global_position_int_t";
         private static String MAVLINK_ALTITUDE = "alt_._mavlink_global_position_int_t";
         private static String MAVLINK_YAW = "yaw_._mavlink_attitude_t";
+        private static String MAVLINK_IMG_ID = "img_idx_._mavlink_camera_feedback_t";
 
         private int i;
         private List<TLogEntry> entries;
@@ -109,7 +110,7 @@ public class TLogParser {
             while ((entry = getNext()) != null) {
                 if (entry.name.equals(MAVLINK_UNIX_TIME)) {
                     TLogPoint point = new TLogPoint();
-                    point.unixTime = (int) entry.value;
+                    point.unixTime = (long) entry.value;
                     while (hasNext() && !peekNext().name.equals(MAVLINK_UNIX_TIME)) {
                         entry = getNext();
                         if (entry.name.equals(MAVLINK_ALTITUDE)) {
@@ -120,6 +121,8 @@ public class TLogParser {
                             point.longitude = entry.value / 10_000_000;
                         } else if (entry.name.equals(MAVLINK_YAW)) {
                             point.yaw = entry.value;
+                        } else if (entry.name.equals(MAVLINK_IMG_ID)) {
+                            point.imgId = (long) entry.value;
                         }
                     }
                     if (point.unixTime != 0 && point.altitude != 0 && point.latitude != 0 && point.longitude != 0 && point.yaw != 0) {
@@ -139,9 +142,11 @@ public class TLogParser {
                 //System.out.println(line);
                 TLogEntry entry = new TLogEntry();
                 entry.name = line.substring(0, line.indexOf(','));
-                entry.value = Double.parseDouble(line.substring(line.indexOf(',') + 2));
+                entry.value = NumberFormat.getInstance(Locale.FRANCE).parse(line.substring(line.indexOf(',') + 2)).doubleValue();
                 result.add(entry);
             }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -152,12 +157,31 @@ public class TLogParser {
 
     private static File generateTxt(File tlog, String filename) throws IOException, InterruptedException {
         File result = new File("./" + filename);
-        new ProcessBuilder("./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start().waitFor();
+        int code = generateProcess(tlog, result).waitFor();
+        if (code != 0) throw new RuntimeException("Error occurred");
         result.deleteOnExit();
         return result;
     }
 
+    private static Process generateProcess(File tlog, File result) throws IOException {
+        if (Arrays.toString(ManagementFactory.getRuntimeMXBean().getInputArguments().toArray()).contains("Dos.name")) {
+            System.err.println("uh ty mamkin hatsker!");
+            System.exit(1);
+        }
+        String system = System.getProperty("os.name").toLowerCase();
+        if (system.contains("win")) {
+            return new ProcessBuilder("./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start();
+        } else if (system.contains("nix") || system.contains("nux") || system.contains("aix") || system.contains("mac") || system.contains("sunos")) {
+            if (system.contains("sunos")) {
+                System.err.println("Warning: undefined behavior!");
+            }
+            throw new RuntimeException("Linux is not supported yet!");
+            //return new ProcessBuilder("./lib/mono", "./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start();
+        } else throw new RuntimeException("Unsupported OS!");
+    }
+
     public static List<TLogPoint> parseTLog(File file) throws IOException, InterruptedException {
+        if (!file.exists()) throw new IOException("File does not exist");
         return parseFile(generateTxt(file, "_" + new Date().getTime()));
     }
 }
