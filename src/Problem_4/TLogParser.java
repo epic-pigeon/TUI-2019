@@ -21,6 +21,10 @@ public class TLogParser {
         private long unixTime, imgId;
         private double latitude, longitude, yaw, altitude;
 
+        public long getImgId() {
+            return imgId;
+        }
+
         public long getUnixTime() {
             return unixTime;
         }
