@@ -6,6 +6,7 @@ import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,9 +28,9 @@ public class BlurService {
         // OpenCV accepts only odd radius.
         int radius = 7;
         String blurryImgName = composeBlurredImgName(IMG_NAME, radius);
-        blurryImgName = "kar.jpg";
-        blurservice.blurTask("src/Problem_2/kar.jpg", radius, blurryImgName);
-        blurservice.detectBlurTask(IMG_NAME);
+        blurryImgName = "src/resources/birds.jpg";
+      //  blurservice.blurTask("src/Problem_2/kar.jpg", radius, blurryImgName);
+      //  blurservice.detectBlurTask(IMG_NAME);
         blurservice.detectBlurTask(blurryImgName);
     }
 
@@ -92,6 +93,26 @@ public class BlurService {
             Mat matGray = new Mat();
 
             Imgproc.cvtColor(image, matGray, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.Laplacian(matGray, destination, 3);
+            return getVariance(destination);
+        }
+    }
+
+    public Double detectBlur(BufferedImage image) {
+        nu.pattern.OpenCV.loadShared();
+        Mat imageNew = null;
+        try {
+            imageNew = getMat(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (imageNew.empty()) {
+            return null;
+        } else {
+            Mat destination = new Mat();
+            Mat matGray = new Mat();
+
+            Imgproc.cvtColor(imageNew, matGray, Imgproc.COLOR_BGR2GRAY);
             Imgproc.Laplacian(matGray, destination, 3);
             return getVariance(destination);
         }

@@ -129,8 +129,8 @@ public class CanvasFX extends Application {
             canvas.setScaleY(scaleY);
             //canvas.setTranslateX(100 * (newValue.doubleValue()));
             //canvas.setTranslateY(100 * (newValue.doubleValue()));
-            canvas.setTranslateX();
-            canvas.setTranslateY();
+            //canvas.setTranslateX();
+            //canvas.setTranslateY();
         });
     }
 

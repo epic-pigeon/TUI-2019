@@ -140,7 +140,9 @@ public class SortImage implements Initializable {
 
     //TODO : проверка , что все входящие файлы ТОЛЬКО фото
     private void startPlay(){
+
         if (!inputFiles.isEmpty()) {
+
             // inputFiles = new ArrayList<>(Arrays.asList(new File("src/resources.DronePhotos").listFiles()));
             currentElem = 0;
 
@@ -227,5 +229,10 @@ public class SortImage implements Initializable {
 
         Date date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
         return date;
+    }
+
+    //TODO: перенести в основное окно
+    private void startCanvas(){
+
     }
 }

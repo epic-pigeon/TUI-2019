@@ -193,6 +193,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -272,7 +273,7 @@ public class Controller implements Initializable {
     }
 
     //TODO: Отрегулировать фильтр (менять только числа, а не алгоритм)
-    private Image processingPhoto(Image image) {
+   /* private Image processingPhoto(Image image) {
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
 
         //Это более точная
@@ -289,6 +290,38 @@ public class Controller implements Initializable {
             }
         }
         return SwingFXUtils.toFXImage(bufferedImage2, null);
+    }*/
+
+    //TODO: Отрегулировать фильтр (менять только числа, а не алгоритм)
+    private Image processingPhoto(Image image) {
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+        ArrayList<BufferedImage> images = new ArrayList<>();
+        long c, C;
+        int width = 5, height = 5;
+        for (int y = 0; y < bufferedImage.getHeight(); y += height) {
+            for (int x = 0; x < bufferedImage.getWidth(); x += width) {
+                c = 0;
+                C = 0;
+                for (int i = y; i <= y + height && i < bufferedImage.getHeight(); ++i) {
+                    for (int j = x; j < x + width && j < bufferedImage.getWidth(); ++j) {
+                        ++C;
+                        javafx.scene.paint.Color color = image.getPixelReader().getColor(j, i);
+                        if (color.getGreen() > 0.5 && color.getRed() < color.getGreen() && color.getBlue() < color.getRed()) {
+                            ++c;
+                        }
+                    }
+                }
+                if (2 * c > C) {
+                    for (int i = y; i <= y + height && i < bufferedImage.getHeight(); ++i) {
+                        for (int j = x; j < x + width && j < bufferedImage.getWidth(); ++j) {
+                            bufferedImage.setRGB(j, i, Color.RED.getRGB());
+                        }
+                    }
+                }
+            }
+        }
+
+        return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
     private Image processingPhotoPro(Image image) {

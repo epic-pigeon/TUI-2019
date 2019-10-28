@@ -75,8 +75,8 @@ public class SortImage implements Initializable {
     private void startPlay() throws IOException {
         if (!inputFiles.isEmpty()) {
             //BufferedImage bufferedImage = new Denoise().Denoise2(inputFiles, 100);
-            BufferedImage bufferedImage = new Denoise().Denoise(inputFiles);
-
+           // BufferedImage bufferedImage = new Denoise().Denoise(inputFiles);
+                BufferedImage bufferedImage = new Denoise().DenoiseFromBits(inputFiles);
             Image image = SwingFXUtils.toFXImage(bufferedImage, null);
             mainFrameImageView.setImage(image);
         }
