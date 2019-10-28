@@ -19,13 +19,11 @@ public class PhotoCropper {
         Graphics g = result.getGraphics();
         BlurService service = new BlurService();
         int width = images.get(0).getWidth(), height = images.get(0).getHeight();
-
         // Apply Laplacian operator to each image.
         List<Mat> laplacianMats = new ArrayList<>();
         for (BufferedImage image : images) {
             laplacianMats.add(service.getLaplacianMat(image));
         }
-
         for (int y = 0; y < height; y += h) {
             for (int x = 0; x < width; x += w) {
                 // Finding best image id for current region defined by (x,y). Best region has highest variance
@@ -40,7 +38,6 @@ public class PhotoCropper {
                         bestImgId = imgId;
                     }
                 }
-
                 // Inserting best image region to the result image.
                 BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
                 g.drawImage(bitFinishImage, x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y), null);
