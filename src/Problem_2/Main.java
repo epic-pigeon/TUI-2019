@@ -13,7 +13,7 @@ import java.io.IOException;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/Problem_2/sortImages.fxml"));
         primaryStage.setTitle("Upload Files");
         primaryStage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
