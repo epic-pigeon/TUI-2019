@@ -22,14 +22,14 @@ public class PhotoCropper {
                 BufferedImage bitFinishImage = null;
                 Double value = 0.0;
                 for (BufferedImage image : images) {
-                    BufferedImage candidate = image.getSubimage(x , y , Math.min(w, width - 1 - x), Math.min(h , height - 1 - y));
+                    BufferedImage candidate = image.getSubimage(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
                     Double temp = service.detectBlur(candidate);
                     if (temp > value) {
                         value = temp;
                         bitFinishImage = candidate;
                     }
                 }
-                g.drawImage(bitFinishImage, x, y, w, h, null);
+                g.drawImage(bitFinishImage, x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y), null);
             }
         }
         return result;
