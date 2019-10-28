@@ -6,7 +6,6 @@ import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -118,7 +117,7 @@ public class BlurService {
         }
     }
 
-    private Double getVariance(Mat destination) {
+    public Double getVariance(Mat destination) {
         MatOfDouble std = new MatOfDouble();
         Core.meanStdDev(destination, new MatOfDouble(), std);
         return Math.pow(std.get(0, 0)[0], 2.0);
