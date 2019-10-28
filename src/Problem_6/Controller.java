@@ -325,34 +325,56 @@ public class Controller implements Initializable {
     }
 
     private Image processingPhotoPro(Image image) {
-        //BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
-
-        //Это более точная
         BufferedImage bufferedImage2 = SwingFXUtils.fromFXImage(image, null);
-        for (int i = 0; i < image.getHeight(); ++i) {
-            for (int j = 0; j < image.getWidth(); ++j) {
-                javafx.scene.paint.Color _color = image.getPixelReader().getColor(j, i);
-                Color color = new Color(
-                        (int) (_color.getRed() * 255),
-                        (int) (_color.getGreen() * 255),
-                        (int) (_color.getBlue() * 255)
-                );
+        int width = (int) image.getWidth(), height = (int) image.getHeight();
+        int h = 10, w = 10;
 
-                Color greenGradientStart = new Color(0, 80, 0);
-                Color greenGradientEnd = new Color(200, 200, 100);
-                Color blueGradientStart = new Color(0, 0, 255);
-                Color blueGradientEnd = new Color(255, 0, 0);
+        for (int y = 0; y < height; y += h) {
+            for (int x = 0; x < width; x += w) {
+                //кол-во подходящих и всех (можно перемножать стороны прямоугольника, но тогда нужны случаи)
+                int c = 0, C = 0;
+                for (int i = y; i < h + y && i < height; ++i) {
+                    for (int j = x; j < w + x && j < width; ++j) {
+                        C++;
+                        javafx.scene.paint.Color _color = image.getPixelReader().getColor(j, i);
+                        Color color = new Color(
+                                (int) (_color.getRed() * 255),
+                                (int) (_color.getGreen() * 255),
+                                (int) (_color.getBlue() * 255)
+                        );
+                        Color greenGradientStart = new Color(0, 80, 0);
+                        Color greenGradientEnd = new Color(200, 200, 100);
+                        if (checkInGradient(greenGradientStart, greenGradientEnd, color)) {
+                            c++;
+                        }
+                    }
+                }
+                for (int i = y; i < h + y && i < height; ++i) {
+                    for (int j = x; j < w + x && j < width; ++j) {
 
-                if (checkInGradient(greenGradientStart, greenGradientEnd, color)) {
-                    bufferedImage2.setRGB(j, i,
-                            mapColor(
-                                    greenGradientStart, greenGradientEnd,
-                                    blueGradientStart, blueGradientEnd,
-                                    color
-                            ).getRGB()
-                    );
-                } else {
-                    bufferedImage2.setRGB(j, i, 0);
+                        javafx.scene.paint.Color _color = image.getPixelReader().getColor(j, i);
+                        Color color = new Color(
+                                (int) (_color.getRed() * 255),
+                                (int) (_color.getGreen() * 255),
+                                (int) (_color.getBlue() * 255)
+                        );
+
+                        Color greenGradientStart = new Color(0, 80, 0);
+                        Color greenGradientEnd = new Color(200, 200, 100);
+                        Color blueGradientStart = new Color(0, 0, 255);
+                        Color blueGradientEnd = new Color(255, 0, 0);
+                        if (/*1.5 * c >= C &&*/ checkInGradient(greenGradientStart, greenGradientEnd, color)) {
+                            bufferedImage2.setRGB(j, i,
+                                    mapColor(
+                                            greenGradientStart, greenGradientEnd,
+                                            blueGradientStart, blueGradientEnd,
+                                            color
+                                    ).getRGB()
+                            );
+                        } else {
+                            bufferedImage2.setRGB(j, i, 0);
+                        }
+                    }
                 }
             }
         }
