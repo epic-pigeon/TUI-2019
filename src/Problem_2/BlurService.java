@@ -97,8 +97,7 @@ public class BlurService {
         }
     }
 
-    public Double detectBlur(BufferedImage image) {
-        nu.pattern.OpenCV.loadShared();
+    public Mat getLaplacianMat(BufferedImage image) {
         Mat imageNew = null;
         try {
             imageNew = getMat(image);
@@ -113,7 +112,7 @@ public class BlurService {
 
             Imgproc.cvtColor(imageNew, matGray, Imgproc.COLOR_BGR2GRAY);
             Imgproc.Laplacian(matGray, destination, 3);
-            return getVariance(destination);
+            return destination;
         }
     }
 

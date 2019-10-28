@@ -43,6 +43,8 @@ public class SortImage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        nu.pattern.OpenCV.loadShared();
+
         //Подготовил FileChooser для загрузки файлов, установив фильры
         fileChooser.setTitle("Select Files");
         fileChooser.setInitialDirectory(new File("C:/Users"));
