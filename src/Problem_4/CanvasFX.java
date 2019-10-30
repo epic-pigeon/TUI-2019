@@ -22,7 +22,9 @@ import javafx.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarOutputStream;
 
@@ -61,6 +63,11 @@ public class CanvasFX extends Application {
 
         Pane rootMain = new Pane();
 
+      //  canvas.setLayoutX(100);
+      //  canvas.setLayoutY(100);
+        canvas.setTranslateX(100);
+        canvas.setLayoutY(100);
+        //canvas.setCache(true);
         root = new ScrollPane(canvas);
         root.setPrefWidth(paneWidth);
         root.setPrefHeight(paneHeight);
@@ -94,14 +101,17 @@ public class CanvasFX extends Application {
         fileChooser.setInitialDirectory(new File("./"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
 
+        // Temporary
         List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
+       // System.out.println(files.size());
+      //  List<File> files = Arrays.asList(new File("/Problem_4/2016_0101_001131_033.JPG"));
         for (File i : files) {
             String s = i.toURI().toString();
             photos.add(new Pair(new Image(s), Long.valueOf(s.substring(s.length() - 7, s.length() - 4))));
         }
         AtomicReference<Double> minX = new AtomicReference<>(metersFromDegrees(coordinates.get(0).getLongitude()));
         AtomicReference<Double> minY = new AtomicReference<>(metersFromDegrees(90 - coordinates.get(0).getLatitude()));
-
+        AtomicLong c = new AtomicLong(0);
         okBtn.setOnAction(event -> {
             for (TLogParser.TLogPoint kar : coordinates) {
                 minX.set(Math.min(minX.get(), metersFromDegrees(kar.getLongitude())));
@@ -116,21 +126,24 @@ public class CanvasFX extends Application {
                 r = new Rotate((180 * (kar.getYaw() - Math.PI)) / Math.PI, w / 2 + imgX, h / 2 + imgY);
                 gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
                 gc.drawImage(image, imgX, imgY, w, h);
+                c.getAndIncrement();
             }
+            System.out.println(c);
         });
-        System.out.println(canvas.getScaleX());
+
+     //   System.out.println(canvas.getScaleX());
+
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.doubleValue() < -0.9) newValue = -0.9;
-            System.out.println(newValue);
+         //   System.out.println(newValue);
             //canvas.setTranslateX();
             //canvas.setTranslateY();
             double scaleX = newValue.doubleValue() + 1, scaleY = newValue.doubleValue() + 1;
             canvas.setScaleX(scaleX);
             canvas.setScaleY(scaleY);
-            //canvas.setTranslateX(100 * (newValue.doubleValue()));
-            //canvas.setTranslateY(100 * (newValue.doubleValue()));
-            //canvas.setTranslateX();
-            //canvas.setTranslateY();
+            canvas.setTranslateX(100 + newValue.doubleValue()*canvas.getWidth()/2);
+            canvas.setTranslateY(100 + newValue.doubleValue()*canvas.getHeight()/2);
         });
     }
 
