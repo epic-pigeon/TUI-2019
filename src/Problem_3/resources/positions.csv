@@ -1,7 +1,7 @@
 file_name,angle,delta_x,delta_y
-building_x0y0.JPG,0,0,0
-building_x0y0_blur.JPG,0,0,0
-building_x0y300.JPG,0,0,300
-building_x0y300_blur.JPG,0,0,300
-building_x100y0.JPG,0,100,0
-building_x100y300.JPG,0,100,300
+building_x0y0.JPG,360,0,0
+building_x0y0_blur.JPG,90,0,0
+building_x0y300.JPG,360,0,300
+building_x0y300_blur.JPG,360,0,300
+building_x100y0.JPG,360,100,0
+building_x100y300.JPG,360,100,300
