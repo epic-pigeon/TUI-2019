@@ -27,9 +27,9 @@ public class BlurService {
         // OpenCV accepts only odd radius.
         int radius = 7;
         String blurryImgName = composeBlurredImgName(IMG_NAME, radius);
-        blurryImgName = "kar.jpg";
-        blurservice.blurTask("src/Problem_2/kar.jpg", radius, blurryImgName);
-        blurservice.detectBlurTask(IMG_NAME);
+        blurryImgName = "src/resources/birds.jpg";
+      //  blurservice.blurTask("src/Problem_2/kar.jpg", radius, blurryImgName);
+      //  blurservice.detectBlurTask(IMG_NAME);
         blurservice.detectBlurTask(blurryImgName);
     }
 
@@ -97,7 +97,26 @@ public class BlurService {
         }
     }
 
-    private Double getVariance(Mat destination) {
+    public Mat getLaplacianMat(BufferedImage image) {
+        Mat imageNew = null;
+        try {
+            imageNew = getMat(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (imageNew.empty()) {
+            return null;
+        } else {
+            Mat destination = new Mat();
+            Mat matGray = new Mat();
+
+            Imgproc.cvtColor(imageNew, matGray, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.Laplacian(matGray, destination, 3);
+            return destination;
+        }
+    }
+
+    public Double getVariance(Mat destination) {
         MatOfDouble std = new MatOfDouble();
         Core.meanStdDev(destination, new MatOfDouble(), std);
         return Math.pow(std.get(0, 0)[0], 2.0);

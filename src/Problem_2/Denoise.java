@@ -1,5 +1,6 @@
 package Problem_2;
 
+import Problem_2.Algorithm.PhotoCropper;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -14,6 +15,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import org.opencv.imgproc.Imgproc;
 
@@ -331,5 +333,20 @@ public class Denoise {
         Blue = Blue & 0x000000FF; //Mask out anything not blue.
 
         return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
+    }
+
+    public BufferedImage DenoiseFromBits(List<File> inputFiles){
+        Date time = new Date();
+        List<BufferedImage> bufferedImages = new ArrayList<>();
+        for (File file: inputFiles) {
+            try {
+                bufferedImages.add(ImageIO.read(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        BufferedImage result = new PhotoCropper().cropImage(bufferedImages);
+        System.out.println(((double)(new Date().getTime() - time.getTime()))/1000.000);
+        return result;
     }
 }
