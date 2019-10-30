@@ -105,6 +105,14 @@ public class PhotoTransformer {
                 }
                 // Inserting best image region to the result image.
                 BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
+                for (int i = 0; i < bitFinishImage.getHeight(); i++) {
+                    for (int j = 0; j < bitFinishImage.getWidth(); j++) {
+                        int color = bitFinishImage.getRGB(j, i);
+                        if (Color.black.equals(new Color(color))) {
+                            bitFinishImage.setRGB(j, i, result.getRGB(x + j , y + i));
+                        }
+                    }
+                }
                 g.drawImage(bitFinishImage, x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y), null);
             }
         }
