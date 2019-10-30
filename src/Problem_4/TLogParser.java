@@ -9,7 +9,7 @@ import java.util.*;
 public class TLogParser {
     public static class TLogEntry {
         private String name;
-        private double value;
+        private Number value;
 
         @Override
         public String toString() {
@@ -20,6 +20,10 @@ public class TLogParser {
     public static class TLogPoint {
         private long unixTime, imgId;
         private double latitude, longitude, yaw, altitude;
+
+        public long getImgId() {
+            return imgId;
+        }
 
         public long getUnixTime() {
             return unixTime;
@@ -110,19 +114,19 @@ public class TLogParser {
             while ((entry = getNext()) != null) {
                 if (entry.name.equals(MAVLINK_UNIX_TIME)) {
                     TLogPoint point = new TLogPoint();
-                    point.unixTime = (long) entry.value;
+                    point.unixTime = entry.value.longValue();
                     while (hasNext() && !peekNext().name.equals(MAVLINK_UNIX_TIME)) {
                         entry = getNext();
                         if (entry.name.equals(MAVLINK_ALTITUDE)) {
-                            point.altitude = entry.value / 1_000;
+                            point.altitude = entry.value.doubleValue() / 1_000;
                         } else if (entry.name.equals(MAVLINK_LATITUDE)) {
-                            point.latitude = entry.value / 10_000_000;
+                            point.latitude = entry.value.doubleValue() / 10_000_000;
                         } else if (entry.name.equals(MAVLINK_LONGITUDE)) {
-                            point.longitude = entry.value / 10_000_000;
+                            point.longitude = entry.value.doubleValue() / 10_000_000;
                         } else if (entry.name.equals(MAVLINK_YAW)) {
-                            point.yaw = entry.value;
+                            point.yaw = entry.value.doubleValue();
                         } else if (entry.name.equals(MAVLINK_IMG_ID)) {
-                            point.imgId = (long) entry.value;
+                            point.imgId = entry.value.longValue();
                         }
                     }
                     if (point.unixTime != 0 && point.altitude != 0 && point.latitude != 0 && point.longitude != 0 && point.yaw != 0) {
@@ -142,11 +146,14 @@ public class TLogParser {
                 //System.out.println(line);
                 TLogEntry entry = new TLogEntry();
                 entry.name = line.substring(0, line.indexOf(','));
-                entry.value = NumberFormat.getInstance(Locale.FRANCE).parse(line.substring(line.indexOf(',') + 2)).doubleValue();
+
+                String num = line.substring(line.indexOf(',') + 2);
+                entry.value = Double.parseDouble(num);
+                //if (!num.equals(String.valueOf(NumberFormat.getInstance(Locale.FRANCE).parse(num).doubleValue()))) {
+                    //throw new Error();
+                //}
                 result.add(entry);
             }
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
         return result;
     }
