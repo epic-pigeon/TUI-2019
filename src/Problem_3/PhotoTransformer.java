@@ -85,7 +85,7 @@ public class PhotoTransformer {
         Size maxSize = new Size();
         for (BufferedImage image : images) {
             maxSize.height = Math.max(maxSize.height, image.getHeight());
-            maxSize.width = Math.max(maxSize.width, image.getHeight());
+            maxSize.width = Math.max(maxSize.width, image.getWidth());
         }
         for (int i = 0; i < images.size(); i++) {
             images.set(i, adaptToSize(images.get(i), maxSize));
