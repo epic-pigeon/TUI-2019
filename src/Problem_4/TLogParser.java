@@ -1,5 +1,6 @@
 package Problem_4;
 
+import javax.management.relation.RoleUnresolved;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.text.NumberFormat;
@@ -148,7 +149,11 @@ public class TLogParser {
                 entry.name = line.substring(0, line.indexOf(','));
 
                 String num = line.substring(line.indexOf(',') + 2);
-                entry.value = Double.parseDouble(num);
+                try {
+                    entry.value = NumberFormat.getInstance(Locale.FRANCE).parse(num);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
                 //if (!num.equals(String.valueOf(NumberFormat.getInstance(Locale.FRANCE).parse(num).doubleValue()))) {
                     //throw new Error();
                 //}
