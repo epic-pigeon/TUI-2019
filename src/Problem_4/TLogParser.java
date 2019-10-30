@@ -188,6 +188,7 @@ public class TLogParser {
     }
 
     public static List<TLogPoint> parseTLog(File file) throws IOException, InterruptedException {
+        //System.out.println(file);
         if (!file.exists()) throw new IOException("File does not exist");
         return parseFile(generateTxt(file, "_" + new Date().getTime()));
     }
