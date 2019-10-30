@@ -23,7 +23,7 @@ public class Main2 extends Application {
 
         BufferedImage startImg = ImageIO.read(new File("src/Problem_3/birds.jpg"));
         PhotoTransformer photoTransformer = new PhotoTransformer();
-        startImg = photoTransformer.translateImage(startImg , 30, -700, 400);
+        startImg = photoTransformer.translateImage(startImg , new ImagePosition(30, -700, 400));
         ImageView imageView = new ImageView(SwingFXUtils.toFXImage(startImg, null));
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);

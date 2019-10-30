@@ -3,13 +3,18 @@ package Problem_3;
 import Problem_2.BlurService;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class PhotoTransformer {
 
@@ -21,7 +26,7 @@ public class PhotoTransformer {
         int newWidth = (int) Math.floor(w * cos + h * sin);
         int newHeight = (int) Math.floor(h * cos + w * sin);
 
-        BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = rotated.createGraphics();
         AffineTransform at = new AffineTransform();
         at.translate((newWidth - w) / 2, (newHeight - h) / 2);
@@ -39,17 +44,15 @@ public class PhotoTransformer {
 
     //FIXME: величины delta идут как пиксели , а не как реальные координаты
     private BufferedImage transformImageByVector(BufferedImage img, double deltaX, double deltaY) {
-        deltaX = -deltaX;
-        deltaY = -deltaY;
         int w = img.getWidth();
         int h = img.getHeight();
-        int newWidth = w - (int) Math.abs(deltaX);
-        int newHeight = h - (int) Math.abs(deltaY);
+        int newWidth = w + (int) Math.abs(deltaX);
+        int newHeight = h + (int) Math.abs(deltaY);
 
-        BufferedImage transformed = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage transformed = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = transformed.createGraphics();
         AffineTransform at = new AffineTransform();
-        at.translate((newWidth - w) / 2, (newHeight - h) / 2);
+//        at.translate((newWidth - w) / 2, (newHeight - h) / 2);
 
         at.translate(deltaX, deltaY);
         g2d.setTransform(at);
@@ -59,31 +62,49 @@ public class PhotoTransformer {
         return transformed;
     }
 
-    public BufferedImage translateImage(BufferedImage img, double angle, double deltaX, double deltaY) {
-        img = rotateImageByDegrees(img, angle);
-        return transformImageByVector(img, deltaX, deltaY);
+    public BufferedImage translateImage(BufferedImage img, ImagePosition position) {
+        img = rotateImageByDegrees(img, position.getAngle());
+        return transformImageByVector(img, position.getDeltaX(), position.getDeltaY());
+    }
+
+    private BufferedImage adaptToSize(BufferedImage img, Size maxSize) {
+        BufferedImage transformed = new BufferedImage((int) maxSize.width, (int) maxSize.height,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = transformed.createGraphics();
+        g2d.drawImage(img, 0, 0, null);
+        return transformed;
     }
 
     private final int w = 30;
     private final int h = 30;
 
-    public BufferedImage cropImage(List<BufferedImage> images) {
-        double angle, deltaX, deltaY;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(images.get(0).getHeight());
+    public BufferedImage cropImage(List<BufferedImage> images, List<ImagePosition> positions) {
         for (int i = 0; i < images.size(); i++) {
-            angle = scanner.nextDouble();
-            deltaX = scanner.nextDouble();
-            deltaY = scanner.nextDouble();
-            images.set(i, translateImage(images.get(i), angle, deltaX, deltaY));
+            images.set(i, translateImage(images.get(i), positions.get(i)));
         }
+        Size maxSize = new Size();
+        for (BufferedImage image : images) {
+            maxSize.height = Math.max(maxSize.height, image.getHeight());
+            maxSize.width = Math.max(maxSize.width, image.getHeight());
+        }
+        for (int i = 0; i < images.size(); i++) {
+            images.set(i, adaptToSize(images.get(i), maxSize));
+        }
+        save("src/Problem_3/resources/tmp_result/", images);
 
-        System.out.println(images.get(0).getHeight());
+        System.out.println("Image size: " + images.get(0).getHeight() + "x" + images.get(0).getWidth());
+        return cropImageAfterTransform(images);
+    }
 
-        BufferedImage result = new BufferedImage(2000 , 2000 , BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage cropImageAfterTransform(List<BufferedImage> images) {
+        int width = images.get(0).getWidth(), height = images.get(0).getHeight();
+        BufferedImage result = getImageAll(images);
+        save("src/Problem_3/resources/tmp_result/", new ArrayList<BufferedImage>() {{
+            add(result);
+        }});
+
         Graphics g = result.getGraphics();
         BlurService service = new BlurService();
-        int width = images.get(0).getWidth(), height = images.get(0).getHeight();
         // Apply Laplacian operator to each image.
         List<Mat> laplacianMats = new ArrayList<>();
         for (BufferedImage image : images) {
@@ -117,5 +138,43 @@ public class PhotoTransformer {
             }
         }
         return result;
+    }
+
+    private void save(String directoryPath, List<BufferedImage> images) {
+        File dir = new File(directoryPath);
+        if (!dir.exists()) {
+            boolean dirCreated = dir.mkdirs();
+            assert dirCreated;
+        }
+        for (int i = 0; i < images.size(); i++) {
+            File file = Paths.get(directoryPath, System.currentTimeMillis() + "_image" + i + ".jpg").toFile();
+            try {
+                ImageIO.write(images.get(i), "JPG", file);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
+
+    private BufferedImage getImageAll(List<BufferedImage> images) {
+        boolean fl;
+        BufferedImage res = images.get(0);
+        for (int i = 0; i < res.getHeight(); i++) {
+            for (int j = 0; j < res.getWidth(); j++) {
+                fl = true;
+                for (int k = 0; k < images.size(); k++) {
+                    int color = images.get(k).getRGB(j, i);
+                    if (!Color.black.equals(new Color(color))) {
+                        res.setRGB(j, i, color);
+                        fl = false;
+                        break;
+                    }
+                }
+                if (fl) {
+                    res.setRGB(j, i, images.get(0).getRGB(j, i));
+                }
+            }
+        }
+        return res;
     }
 }
