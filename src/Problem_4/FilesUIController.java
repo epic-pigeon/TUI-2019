@@ -51,7 +51,7 @@ public class FilesUIController implements Initializable {
         final int max_row = 7;
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Files");
-        fileChooser.setInitialDirectory(new File("C:/Users/Tony/Desktop/TUI-2019(2)"));
+//        fileChooser.setInitialDirectory(new File("C:/Users/Tony/Desktop/TUI-2019(2)"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
 
         List<File> files = fileChooser.showOpenMultipleDialog(gridPane.getScene().getWindow());

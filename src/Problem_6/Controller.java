@@ -184,7 +184,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
@@ -199,11 +199,11 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
     @FXML
-    private AnchorPane originalAnchorPane;
+    private Pane originalPane;
     @FXML
-    private AnchorPane processedAnchorPane;
+    private Pane processedPane;
     @FXML
-    private AnchorPane processedProAnchorPane;
+    private Pane processedProPane;
     @FXML
     private MenuItem uploadImageBtn;
 
@@ -219,7 +219,7 @@ public class Controller implements Initializable {
 
         uploadImageBtn.setOnAction(event -> {
             try {
-                fileImg = fileChooser.showOpenDialog(originalAnchorPane.getScene().getWindow());
+                fileImg = fileChooser.showOpenDialog(originalPane.getScene().getWindow());
                 VBox vBox = new VBox();
                 String filePath = fileImg.toURI().toString();
 
@@ -264,9 +264,9 @@ public class Controller implements Initializable {
                 vBox3.getChildren().addAll(iv3, new Label(fileImg.getName()));
                 vBox3.setPadding(new Insets(1, 1, 1, 1));
 
-                originalAnchorPane.getChildren().add(vBox);
-                processedAnchorPane.getChildren().add(vBox2);
-                processedProAnchorPane.getChildren().add(vBox3);
+                originalPane.getChildren().add(vBox);
+                processedPane.getChildren().add(vBox2);
+                processedProPane.getChildren().add(vBox3);
             } catch (NullPointerException e) {
             }
         });

@@ -1,47 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<SplitPane fx:id="splitPane" dividerPositions="0.1" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="450.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_3.SortImage">
-  <items>
-      <VBox prefHeight="448.0" style="-fx-background-color: transparent;">
-         <children>
-            <MenuBar prefHeight="25.0" prefWidth="444.0">
-              <menus>
-                <Menu mnemonicParsing="false" text="Файлы">
-                  <items>
-                    <MenuItem fx:id="uploadFiles" mnemonicParsing="false" text="Загрузить файлы" />
-                      <MenuItem fx:id="addFiles" mnemonicParsing="false" text="Добавить файлы" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Воспроизведение">
-                  <items>
-                    <MenuItem fx:id="run" mnemonicParsing="false" text="Вручную" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-            <AnchorPane fx:id="anchor" prefHeight="424.0" prefWidth="285.0" style="-fx-background-color: transparent;" />
-         </children>
-      </VBox>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" style="-fx-background-color: rgba(10, 20 , 200, 0.3);">
-         <children>
-            <BorderPane prefHeight="398.0" prefWidth="570.0" style="-fx-background-color: transparent;">
-               <center>
-                  <AnchorPane prefHeight="375.0" prefWidth="594.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER_LEFT">
-                     <children>
-                        <ImageView fx:id="mainFrameImageView" fitHeight="800.0" fitWidth="855.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <image>
-                              <Image url="@../resources/DronePhotos/2016_0101_000725_002.JPG" />
-                           </image>
-                        </ImageView>
 
-                     </children>
-                  </AnchorPane>
-               </center>
-            </BorderPane>
-         </children></AnchorPane>
-  </items>
+<SplitPane fx:id="splitPane" dividerPositions="0.25" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity"
+           minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="600.0" prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_3.SortImage">
+    <items>
+        <VBox prefHeight="448.0" style="-fx-background-color: transparent;">
+            <children>
+                <MenuBar prefHeight="25.0" prefWidth="444.0">
+                    <menus>
+                        <Menu mnemonicParsing="false" text="Файлы">
+                            <items>
+                                <MenuItem fx:id="uploadFiles" mnemonicParsing="false" text="Загрузить файлы"/>
+                                <MenuItem fx:id="addFiles" mnemonicParsing="false" text="Добавить файлы"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Воспроизведение">
+                            <items>
+                                <MenuItem fx:id="run" mnemonicParsing="false" text="Вручную"/>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <AnchorPane fx:id="anchor" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0"
+                            prefWidth="250.0" style="-fx-background-color: transparent;"/>
+            </children>
+        </VBox>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0"
+                    style="-fx-background-color: rgba(10, 20 , 200, 0.3);">
+            <children>
+                <BorderPane prefHeight="398.0" prefWidth="570.0" style="-fx-background-color: transparent;">
+                    <center>
+                        <AnchorPane prefHeight="375.0" prefWidth="594.0" style="-fx-background-color: transparent;"
+                                    BorderPane.alignment="CENTER_LEFT">
+                            <children>
+                                <ImageView fx:id="mainFrameImageView" fitHeight="800.0" fitWidth="1000.0" layoutX="26.0"
+                                           layoutY="7.0" pickOnBounds="true" preserveRatio="true"
+                                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <image>
+                                        <Image url="@../resources/DronePhotos/2016_0101_000725_002.JPG"/>
+                                    </image>
+                                </ImageView>
+
+                            </children>
+                        </AnchorPane>
+                    </center>
+                </BorderPane>
+            </children>
+        </AnchorPane>
+    </items>
 </SplitPane>

@@ -16,7 +16,8 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/Problem_5/sortImages.fxml"));
         primaryStage.setTitle("Upload Files");
         primaryStage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
-        primaryStage.setScene(new Scene(root, 1450, 960));
+        primaryStage.setScene(new Scene(root, 1000, 600));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
