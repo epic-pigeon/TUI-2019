@@ -6,10 +6,7 @@ import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class BlurService {
     // Change to target image name.
@@ -59,17 +56,25 @@ public class BlurService {
         return getImage(destination);
     }
 
-    public static Mat getMat(BufferedImage image) throws IOException {
+    public static Mat getMat(BufferedImage image) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(image, IMG_FORMAT, byteArrayOutputStream);
-        byteArrayOutputStream.flush();
+        try {
+            ImageIO.write(image, IMG_FORMAT, byteArrayOutputStream);
+            byteArrayOutputStream.flush();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
     }
 
-    public static BufferedImage getImage(Mat matrix) throws IOException {
+    public static BufferedImage getImage(Mat matrix) {
         MatOfByte mob = new MatOfByte();
         Imgcodecs.imencode("." + IMG_FORMAT, matrix, mob);
-        return ImageIO.read(new ByteArrayInputStream(mob.toArray()));
+        try {
+            return ImageIO.read(new ByteArrayInputStream(mob.toArray()));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -99,11 +104,7 @@ public class BlurService {
 
     public Mat getLaplacianMat(BufferedImage image) {
         Mat imageNew = null;
-        try {
-            imageNew = getMat(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        imageNew = getMat(image);
         if (imageNew.empty()) {
             return null;
         } else {
