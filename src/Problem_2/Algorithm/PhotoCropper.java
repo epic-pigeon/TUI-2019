@@ -28,7 +28,7 @@ public class PhotoCropper {
             for (int x = 0; x < width; x += w) {
                 // Finding best image id for current region defined by (x,y). Best region has highest variance
                 // after Laplacian operator.
-                Rect rect = new Rect(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
+                Rect rect = new Rect(x, y, Math.min(w, width - x), Math.min(h, height - y));
                 double maxVariance = 0;
                 int bestImgId = 0;
                 for (int imgId = 0; imgId < images.size(); imgId++) {
@@ -39,8 +39,9 @@ public class PhotoCropper {
                     }
                 }
                 // Inserting best image region to the result image.
-                BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
-                g.drawImage(bitFinishImage, x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y), null);
+                BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - x),
+                        Math.min(h, height - y));
+                g.drawImage(bitFinishImage, x, y, bitFinishImage.getWidth(), bitFinishImage.getHeight(), null);
             }
         }
         return result;

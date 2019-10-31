@@ -3,9 +3,6 @@ package Problem_4;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,8 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.jar.JarOutputStream;
 
 public class CanvasFX extends Application {
     public static void main(String[] args) {
@@ -101,7 +98,7 @@ public class CanvasFX extends Application {
         }
         AtomicReference<Double> minX = new AtomicReference<>(metersFromDegrees(coordinates.get(0).getLongitude()));
         AtomicReference<Double> minY = new AtomicReference<>(metersFromDegrees(90 - coordinates.get(0).getLatitude()));
-
+        AtomicLong c = new AtomicLong(0);
         okBtn.setOnAction(event -> {
             for (TLogParser.TLogPoint kar : coordinates
             ) {
@@ -115,10 +112,15 @@ public class CanvasFX extends Application {
                 double x = kar.getLongitude(), y = 90 - kar.getLatitude();
                 double imgX = delta + (metersFromDegrees(x) - minX.get()) * scale, imgY = delta + (metersFromDegrees(y) - minY.get()) * scale;
                 Rotate r = new Rotate((180 * (kar.getYaw() - Math.PI)) / Math.PI, w / 2 + imgX, h / 2 + imgY);
+                Rotate finalR = r;
                 ((AsyncImage) image).onLoad(() -> {
-                    gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+                    gc.setTransform(finalR.getMxx(), finalR.getMyx(), finalR.getMxy(), finalR.getMyy(), finalR.getTx(), finalR.getTy());
                     gc.drawImage(image, imgX, imgY, w, h);
                 }, true);
+                r = new Rotate((180 * (kar.getYaw() - Math.PI)) / Math.PI, w / 2 + imgX, h / 2 + imgY);
+                gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+                gc.drawImage(image, imgX, imgY, w, h);
+                c.getAndIncrement();
             }
         });
         System.out.println(canvas.getScaleX());
@@ -130,10 +132,8 @@ public class CanvasFX extends Application {
             double scaleX = newValue.doubleValue() + 1, scaleY = newValue.doubleValue() + 1;
             canvas.setScaleX(scaleX);
             canvas.setScaleY(scaleY);
-            //canvas.setTranslateX(100 * (newValue.doubleValue()));
-            //canvas.setTranslateY(100 * (newValue.doubleValue()));
-            //canvas.setTranslateX();
-            //canvas.setTranslateY();
+            canvas.setTranslateX(100 + newValue.doubleValue()*canvas.getWidth()/2);
+            canvas.setTranslateY(100 + newValue.doubleValue()*canvas.getHeight()/2);
         });
     }
 

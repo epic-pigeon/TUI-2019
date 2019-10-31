@@ -14,8 +14,15 @@ import static Problem_3.TestDataProvider.getImages;
 public class MainCli {
 
     private static final String IMG_DIR = "src/Problem_3/resources/";
-    private static final List<String> IMG_NAMES = Arrays.asList("building_x0y0_blur.JPG", "building_x0y300_blur.JPG",
+    private static final List<String> IMG_NAMES_FOR_SHIFT_TEST = Arrays.asList(
+            "building_x0y0_blur.JPG",
+            "building_x0y300_blur.JPG",
             "building_x100y300.JPG");
+    private static final List<String> IMG_NAMES_FOR_ANGLE_TEST = Arrays.asList(
+            "building399n199_x200y100a0.jpg",
+            "building399n199_x350y200a0.jpg",
+            "building399n199_x350y200a45.jpg"
+    );
     private static final String POSITIONS_PATH = "src/Problem_3/resources/positions.csv";
     private static final String RESULT_DIR = "src/Problem_3/resources/tmp_result/";
 
@@ -23,9 +30,9 @@ public class MainCli {
         nu.pattern.OpenCV.loadShared();
 
         PhotoTransformer photoTransformer = new PhotoTransformer();
-        List<ImagePosition> imagePositions = getImagePositions(POSITIONS_PATH, IMG_NAMES);
+        List<ImagePosition> imagePositions = getImagePositions(POSITIONS_PATH, IMG_NAMES_FOR_ANGLE_TEST);
 
-        BufferedImage result = photoTransformer.cropImage(getImages(IMG_DIR, IMG_NAMES), imagePositions);
+        BufferedImage result = photoTransformer.cropImage(getImages(IMG_DIR, IMG_NAMES_FOR_ANGLE_TEST), imagePositions);
 
         if (!new File(RESULT_DIR).exists()) {
             new File(RESULT_DIR).mkdirs();
