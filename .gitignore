@@ -7,3 +7,5 @@ vcs.xml
 out/
 # Default ignored files
 workspace.xml
+
+tmp_result
