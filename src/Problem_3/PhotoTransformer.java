@@ -145,7 +145,7 @@ public class PhotoTransformer {
             for (int x = 0; x < width; x += w) {
                 // Finding best image id for current region defined by (x,y). Best region has highest variance
                 // after Laplacian operator.
-                Rect rect = new Rect(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
+                Rect rect = new Rect(x, y, Math.min(w, width - x), Math.min(h, height - y));
                 double maxVariance = 0;
                 int bestImgId = 0;
                 for (int imgId = 0; imgId < images.size(); imgId++) {
@@ -156,7 +156,8 @@ public class PhotoTransformer {
                     }
                 }
                 // Inserting best image region to the result image.
-                BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y));
+                BufferedImage bitFinishImage = images.get(bestImgId).getSubimage(x, y, Math.min(w, width - x),
+                        Math.min(h, height - y));
                 for (int i = 0; i < bitFinishImage.getHeight(); i++) {
                     for (int j = 0; j < bitFinishImage.getWidth(); j++) {
                         int color = bitFinishImage.getRGB(j, i);
@@ -165,7 +166,7 @@ public class PhotoTransformer {
                         }
                     }
                 }
-                g.drawImage(bitFinishImage, x, y, Math.min(w, width - 1 - x), Math.min(h, height - 1 - y), null);
+                g.drawImage(bitFinishImage, x, y, bitFinishImage.getWidth(), bitFinishImage.getHeight(), null);
             }
         }
         return result;
