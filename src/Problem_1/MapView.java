@@ -22,6 +22,7 @@ public class MapView extends Region {
     private Pattern strokePattern = null;
     private Pattern fillPattern = null;
     private long lineWidth = 1;
+    private boolean postUpdate = true;
 
     public Pattern getStrokePattern() {
         return strokePattern;
@@ -172,7 +173,15 @@ public class MapView extends Region {
         );
     }
 
-    private void update() {
+    private void updateAfterOperation() {
+        if (postUpdate) update();
+    }
+
+    public void setPostUpdate(boolean postUpdate) {
+        this.postUpdate = postUpdate;
+    }
+
+    public void update() {
         getWebEngine().executeScript(buildFunctionCall(
                 "window.MapOverlay.CanvasOverlay.draw"
         ));
@@ -222,7 +231,7 @@ public class MapView extends Region {
                 coords.getX(), coords.getY(),
                 bounds.getWidth(), bounds.getHeight()
         ));
-        update();
+        updateAfterOperation();
     }
 
     public void fillRect(Coords coords, Bounds bounds) {
@@ -236,7 +245,7 @@ public class MapView extends Region {
                 coords.getX(), coords.getY(),
                 bounds.getWidth(), bounds.getHeight()
         ));
-        update();
+        updateAfterOperation();
     }
 
     public void clearRect(Coords coords, Bounds bounds) {
@@ -250,7 +259,7 @@ public class MapView extends Region {
                 coords.getX(), coords.getY(),
                 bounds.getWidth(), bounds.getHeight()
         ));
-        update();
+        updateAfterOperation();
     }
 
     public void strokeTextPixel(CharSequence text, Coords coords, long maxWidth) {
@@ -316,7 +325,7 @@ public class MapView extends Region {
         getWebEngine().executeScript(buildFunctionCall(
                 "window.MapOverlay.CanvasOverlay.getContext().fill"
         ));
-        update();
+        updateAfterOperation();
     }
 
     public void strokePath() {
@@ -324,7 +333,7 @@ public class MapView extends Region {
         getWebEngine().executeScript(buildFunctionCall(
                 "window.MapOverlay.CanvasOverlay.getContext().stroke"
         ));
-        update();
+        updateAfterOperation();
     }
 
     public void moveToPixel(Coords coords) {
@@ -341,6 +350,7 @@ public class MapView extends Region {
                 "window.MapOverlay.CanvasOverlay.getContext().lineTo",
                 coords.getX(), coords.getY()
         ));
+        updateAfterOperation();
     }
 
     public void moveTo(Coords coords) {
@@ -361,6 +371,7 @@ public class MapView extends Region {
                 startAngle, endAngle,
                 counterClockwise
         ));
+        updateAfterOperation();
     }
 
     public void arcPathPixel(Coords coords, long r, double startAngle, double endAngle) {
