@@ -18,8 +18,8 @@ import java.util.List;
 
 public class PhotoTransformer {
 
-    private BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {
-        double rads = Math.toRadians(angle);
+    private BufferedImage rotateImageByDegrees(BufferedImage img, ImagePosition position) {
+        double rads = Math.toRadians(position.getAngle());
         double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
         int w = img.getWidth();
         int h = img.getHeight();
@@ -29,7 +29,11 @@ public class PhotoTransformer {
         BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = rotated.createGraphics();
         AffineTransform at = new AffineTransform();
+
+        // Move rotated image so that image crop is prevented.
         at.translate((newWidth - w) / 2, (newHeight - h) / 2);
+        position.setDeltaX(position.getDeltaX() - (newWidth - w) / 2);
+        position.setDeltaY(position.getDeltaY() - (newHeight - h) / 2);
 
         int x = w / 2;
         int y = h / 2;
@@ -43,7 +47,9 @@ public class PhotoTransformer {
     }
 
     //FIXME: величины delta идут как пиксели , а не как реальные координаты
-    private BufferedImage transformImageByVector(BufferedImage img, double deltaX, double deltaY) {
+    private BufferedImage transformImageByVector(BufferedImage img, ImagePosition position) {
+        double deltaX = position.getDeltaX();
+        double deltaY = position.getDeltaY();
         int w = img.getWidth();
         int h = img.getHeight();
         int newWidth = w + (int) Math.abs(deltaX);
@@ -52,7 +58,6 @@ public class PhotoTransformer {
         BufferedImage transformed = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = transformed.createGraphics();
         AffineTransform at = new AffineTransform();
-//        at.translate((newWidth - w) / 2, (newHeight - h) / 2);
 
         at.translate(deltaX, deltaY);
         g2d.setTransform(at);
@@ -63,8 +68,8 @@ public class PhotoTransformer {
     }
 
     public BufferedImage translateImage(BufferedImage img, ImagePosition position) {
-        img = rotateImageByDegrees(img, position.getAngle());
-        return transformImageByVector(img, position.getDeltaX(), position.getDeltaY());
+        img = rotateImageByDegrees(img, position);
+        return transformImageByVector(img, position);
     }
 
     private BufferedImage adaptToSize(BufferedImage img, Size maxSize) {
@@ -79,9 +84,27 @@ public class PhotoTransformer {
     private final int h = 30;
 
     public BufferedImage cropImage(List<BufferedImage> images, List<ImagePosition> positions) {
+        translateImages(images, positions);
+        save("src/Problem_3/resources/tmp_result/", images);
+
+        System.out.println("Image size: " + images.get(0).getHeight() + "x" + images.get(0).getWidth());
+        return cropImageAfterTransform(images);
+    }
+
+    private void translateImages(List<BufferedImage> images, List<ImagePosition> positions) {
+        // Rotate images.
         for (int i = 0; i < images.size(); i++) {
-            images.set(i, translateImage(images.get(i), positions.get(i)));
+            BufferedImage translatedImage = rotateImageByDegrees(images.get(i), positions.get(i));
+            images.set(i, translatedImage);
         }
+        // Adapt deltaX and deltaY to exclude negative deltas and make deltas as small as possible.
+        changeDeltasStartingPoint(images, positions);
+        // Move each image to specified position.
+        for (int i = 0; i < images.size(); i++) {
+            BufferedImage translatedImage = transformImageByVector(images.get(i), positions.get(i));
+            images.set(i, translatedImage);
+        }
+        // Adapt images to have the same size.
         Size maxSize = new Size();
         for (BufferedImage image : images) {
             maxSize.height = Math.max(maxSize.height, image.getHeight());
@@ -90,10 +113,18 @@ public class PhotoTransformer {
         for (int i = 0; i < images.size(); i++) {
             images.set(i, adaptToSize(images.get(i), maxSize));
         }
-        save("src/Problem_3/resources/tmp_result/", images);
+    }
 
-        System.out.println("Image size: " + images.get(0).getHeight() + "x" + images.get(0).getWidth());
-        return cropImageAfterTransform(images);
+    private void changeDeltasStartingPoint(List<BufferedImage> images, List<ImagePosition> positions) {
+        ImagePosition minDeltas = new ImagePosition(0, images.get(0).getWidth(), images.get(0).getHeight());
+        for (ImagePosition position : positions) {
+            minDeltas.setDeltaX(Math.min(minDeltas.getDeltaX(), position.getDeltaX()));
+            minDeltas.setDeltaY(Math.min(minDeltas.getDeltaY(), position.getDeltaY()));
+        }
+        for (ImagePosition position : positions) {
+            position.setDeltaX(position.getDeltaX() - minDeltas.getDeltaX());
+            position.setDeltaY(position.getDeltaY() - minDeltas.getDeltaY());
+        }
     }
 
     private BufferedImage cropImageAfterTransform(List<BufferedImage> images) {
@@ -130,7 +161,7 @@ public class PhotoTransformer {
                     for (int j = 0; j < bitFinishImage.getWidth(); j++) {
                         int color = bitFinishImage.getRGB(j, i);
                         if (Color.black.equals(new Color(color))) {
-                            bitFinishImage.setRGB(j, i, result.getRGB(x + j , y + i));
+                            bitFinishImage.setRGB(j, i, result.getRGB(x + j, y + i));
                         }
                     }
                 }
