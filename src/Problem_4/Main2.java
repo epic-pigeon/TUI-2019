@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 public class Main2 {
     public static void main(String[] args) {
         try {
-            byte[] arr = Files.readAllBytes(Paths.get(new File("src/Problem_4/file.tlog").toURI()));
+            byte[] arr = Files.readAllBytes(Paths.get(new File("src/Problem_4/resources/file.tlog").toURI()));
             for (byte i : arr) {
                 System.out.println((char) (i & 0xFF));
             }

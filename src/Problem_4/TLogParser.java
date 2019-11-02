@@ -1,8 +1,8 @@
 package Problem_4;
 
-import javax.management.relation.RoleUnresolved;
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -82,11 +82,11 @@ public class TLogParser {
     }
 
     private static class TLogPointsCalculator {
-        private static String MAVLINK_UNIX_TIME = "time_unix_usec_._mavlink_system_time_t";
-        private static String MAVLINK_LATITUDE = "lat_._mavlink_global_position_int_t";
-        private static String MAVLINK_LONGITUDE = "lon_._mavlink_global_position_int_t";
-        private static String MAVLINK_ALTITUDE = "alt_._mavlink_global_position_int_t";
-        private static String MAVLINK_YAW = "yaw_._mavlink_attitude_t";
+        private static String MAVLINK_UNIX_TIME = "time_usec_._mavlink_camera_feedback_t";
+        private static String MAVLINK_LATITUDE = "lat_._mavlink_camera_feedback_t";
+        private static String MAVLINK_LONGITUDE = "lng_._mavlink_camera_feedback_t";
+        private static String MAVLINK_ALTITUDE = "alt_msl_._mavlink_camera_feedback_t";
+        private static String MAVLINK_YAW = "yaw_._mavlink_camera_feedback_t";
         private static String MAVLINK_IMG_ID = "img_idx_._mavlink_camera_feedback_t";
 
         private int i;
@@ -155,7 +155,7 @@ public class TLogParser {
                     throw new RuntimeException(e);
                 }
                 //if (!num.equals(String.valueOf(NumberFormat.getInstance(Locale.FRANCE).parse(num).doubleValue()))) {
-                    //throw new Error();
+                //throw new Error();
                 //}
                 result.add(entry);
             }
@@ -163,12 +163,8 @@ public class TLogParser {
         return result;
     }
 
-    private static List<TLogPoint> parseFile(File file) throws IOException {
-        return TLogFile.from(file).getPoints();
-    }
-
     private static File generateTxt(File tlog, String filename) throws IOException, InterruptedException {
-        File result = new File("./" + filename);
+        File result = Paths.get(tlog.getParentFile().getAbsolutePath(), "tlog_parsed", filename).toFile();
         int code = generateProcess(tlog, result).waitFor();
         if (code != 0) throw new RuntimeException("Error occurred");
         result.deleteOnExit();
@@ -195,6 +191,14 @@ public class TLogParser {
     public static List<TLogPoint> parseTLog(File file) throws IOException, InterruptedException {
         //System.out.println(file);
         if (!file.exists()) throw new IOException("File does not exist");
-        return parseFile(generateTxt(file, "_" + new Date().getTime()));
+        return parseTextFile(generateTxt(file, "parsed_" + new Date().getTime() + ".txt"));
+    }
+
+    public static List<TLogPoint> parseTextFile(File file) {
+        try {
+            return TLogFile.from(file).getPoints();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
