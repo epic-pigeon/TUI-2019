@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+import static Problem_3.TestDataProvider.getImagePositions;
+import static Problem_3.TestDataProvider.getImages;
+
 public class Denoise {
 
     public BufferedImage DenoiseFromBits(List<File> inputFiles) {
@@ -40,5 +43,38 @@ public class Denoise {
         }
 
         return positions;
+    }
+
+    public BufferedImage Denoise(List<File> files){
+        nu.pattern.OpenCV.loadShared();
+
+        PhotoTransformer photoTransformer = new PhotoTransformer();
+        String POSITIONS_PATH = "";
+        List<String> IMG_NAMES = new ArrayList<>();
+        String IMG_DIR = "src/Problem_3/resources/";
+        String RESULT_DIR = "src/Problem_3/resources/tmp_result/";
+
+        boolean fl = true;
+        for (File file: files){
+            if (fl){
+                if (file.toURI().toString().endsWith(".csv")){
+                    fl = false;
+                    POSITIONS_PATH = file.getPath();
+                    continue;
+                }
+            }
+            IMG_NAMES.add(file.getName());
+        }
+
+
+        List<ImagePosition> imagePositions = getImagePositions(POSITIONS_PATH, IMG_NAMES);
+
+        BufferedImage result = photoTransformer.cropImage(getImages(IMG_DIR, IMG_NAMES), imagePositions);
+
+        if (!new File(RESULT_DIR).exists()) {
+            new File(RESULT_DIR).mkdirs();
+        }
+
+        return result;
     }
 }

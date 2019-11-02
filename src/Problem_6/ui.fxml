@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_6.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_6.Controller">
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Original">
+                <Tab text="Оригинал">
                     <content>
                   <StackPane fx:id="originalPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -22,7 +20,7 @@
                   </StackPane>
                     </content>
                 </Tab>
-                <Tab text="Processed">
+                <Tab text="Обработка 1">
                     <content>
                   <StackPane fx:id="processedPane">
                      <children>
@@ -35,7 +33,7 @@
                   </StackPane>
                     </content>
                 </Tab>
-            <Tab text="Processed-PRO">
+            <Tab text="Обработка 2">
                <content>
                   <StackPane fx:id="processedProPane">
                      <children>

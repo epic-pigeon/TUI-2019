@@ -176,10 +176,12 @@ public class Controller implements Initializable {
 
 package Problem_6;
 
+import Problem_2.BlurService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
@@ -187,13 +189,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.opencv.core.Mat;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -241,16 +243,18 @@ public class Controller implements Initializable {
                 iv.setPreserveRatio(true);
                 iv.setSmooth(true);
                 iv.setCache(true);
+                vBox.setAlignment(Pos.CENTER);
                 vBox.getChildren().addAll(iv, new Label(fileImg.getName()));
                 vBox.setPadding(new Insets(1, 1, 1, 1));
 
-                Image processedImg = processingPhoto(image);
+                Image processedImg = processingPhoto(image, filePath);
                 VBox vBox2 = new VBox();
                 ImageView iv2 = new ImageView();
                 iv2.setImage(processedImg);
                 iv2.setPreserveRatio(true);
                 iv2.setSmooth(true);
                 iv2.setCache(true);
+                vBox2.setAlignment(Pos.CENTER);
                 vBox2.getChildren().addAll(iv2, new Label(fileImg.getName()));
                 vBox2.setPadding(new Insets(1, 1, 1, 1));
 
@@ -261,6 +265,7 @@ public class Controller implements Initializable {
                 iv3.setPreserveRatio(true);
                 iv3.setSmooth(true);
                 iv3.setCache(true);
+                vBox3.setAlignment(Pos.CENTER);
                 vBox3.getChildren().addAll(iv3, new Label(fileImg.getName()));
                 vBox3.setPadding(new Insets(1, 1, 1, 1));
 
@@ -272,56 +277,23 @@ public class Controller implements Initializable {
         });
     }
 
-    //TODO: Отрегулировать фильтр (менять только числа, а не алгоритм)
-   /* private Image processingPhoto(Image image) {
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+    private Image processingPhoto(Image image, String filePath) {
+        nu.pattern.OpenCV.loadShared();
+        Mat srcMat = BlurService.getMat(SwingFXUtils.fromFXImage(image, null));
+        ImgProcessor imgProcessor = new ImgProcessor(SwingFXUtils.fromFXImage(image, null), filePath);
 
-        //Это более точная
-        BufferedImage bufferedImage2 = SwingFXUtils.fromFXImage(image, null);
-        for (int i = 0; i < image.getHeight(); ++i) {
-            for (int j = 0; j < image.getWidth(); ++j) {
-                javafx.scene.paint.Color color = image.getPixelReader().getColor(j, i);
-                if (color.getGreen() > 0.4) {
-                    bufferedImage.setRGB(j, i, Color.BLUE.getRGB());
-                    if (color.getGreen() > 0.55 && color.getRed() < color.getGreen() && color.getBlue() < color.getRed()) {
-                        bufferedImage2.setRGB(j, i, Color.BLUE.getRGB());
-                    }
-                }
-            }
-        }
-        return SwingFXUtils.toFXImage(bufferedImage2, null);
-    }*/
+        // Area threshold can be set as a fixed value or relatively to image size.
+        final double contourAreaThreshold = srcMat.size().width * srcMat.size().height * 0.005;
 
-    //TODO: Отрегулировать фильтр (менять только числа, а не алгоритм)
-    private Image processingPhoto(Image image) {
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
-        ArrayList<BufferedImage> images = new ArrayList<>();
-        long c, C;
-        int width = 5, height = 5;
-        for (int y = 0; y < bufferedImage.getHeight(); y += height) {
-            for (int x = 0; x < bufferedImage.getWidth(); x += width) {
-                c = 0;
-                C = 0;
-                for (int i = y; i <= y + height && i < bufferedImage.getHeight(); ++i) {
-                    for (int j = x; j < x + width && j < bufferedImage.getWidth(); ++j) {
-                        ++C;
-                        javafx.scene.paint.Color color = image.getPixelReader().getColor(j, i);
-                        if (color.getGreen() > 0.5 && color.getRed() < color.getGreen() && color.getBlue() < color.getRed()) {
-                            ++c;
-                        }
-                    }
-                }
-                if (2 * c > C) {
-                    for (int i = y; i <= y + height && i < bufferedImage.getHeight(); ++i) {
-                        for (int j = x; j < x + width && j < bufferedImage.getWidth(); ++j) {
-                            bufferedImage.setRGB(j, i, Color.RED.getRGB());
-                        }
-                    }
-                }
-            }
-        }
+        // Turn on saving intermediate files if you want to see how each image processing stage works.
+        imgProcessor.setIntermediateSaving(false)
+                .process("color-emp", ImgProcessingUtils::filterByGreenishColorEmpirically)
+                .process("blur", ImgProcessingUtils::blur)
+                .process("thr", ImgProcessingUtils::brightnessThreshold)
+                .process("top-contours-thr", mat -> ImgProcessingUtils.topContoursOverImage(mat,
+                        contourAreaThreshold, srcMat));
 
-        return SwingFXUtils.toFXImage(bufferedImage, null);
+        return SwingFXUtils.toFXImage(BlurService.getImage(imgProcessor.getMat()), null);
     }
 
     private Image processingPhotoPro(Image image) {

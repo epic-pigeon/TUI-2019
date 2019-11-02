@@ -4,6 +4,7 @@ import Problem_2.BlurService;
 import org.opencv.core.Mat;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -28,6 +29,15 @@ public class ImgProcessor {
             mat = BlurService.getMat(ImageIO.read(new File(path)));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    public ImgProcessor(BufferedImage image, String path) {
+        try {
+            srcPath = path;
+            mat = BlurService.getMat(image);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

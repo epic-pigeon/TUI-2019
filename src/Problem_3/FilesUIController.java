@@ -50,9 +50,11 @@ public class FilesUIController implements Initializable {
     public static void uploadFilesAndUpdate(boolean isAdding) {
         final int max_row = 5;
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Files");
+        fileChooser.setTitle("Выберите набор фото и файл с перемещениями");
         fileChooser.setInitialDirectory(new File("C:/Users/"));
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"),
+                new FileChooser.ExtensionFilter("Translation File", "*.csv"),
+                new FileChooser.ExtensionFilter("All files, which you need", "*.png", "*.jpg", "*.csv"));
 
         List<File> files = fileChooser.showOpenMultipleDialog(gridPane.getScene().getWindow());
         if (files.size() > 0) {
@@ -72,7 +74,10 @@ public class FilesUIController implements Initializable {
                     try {
                         ImageIO.read(input).toString();
                     } catch (Exception e) {
-                        filePath = "/resources/unknown.png";
+                        if (file.toString().endsWith(".csv"))
+                            filePath = "/resources/file.png";
+                        else
+                            filePath = "/resources/unknown.png";
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
