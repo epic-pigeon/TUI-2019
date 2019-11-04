@@ -11,7 +11,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -39,16 +38,9 @@ public class SortImage implements Initializable {
 
     public static ArrayList<File> inputFiles = new ArrayList<>();
 
-    private final FileChooser fileChooser = new FileChooser();
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         nu.pattern.OpenCV.loadShared();
-
-        //Подготовил FileChooser для загрузки файлов, установив фильры
-        fileChooser.setTitle("Select Files");
-        fileChooser.setInitialDirectory(new File("C:/Users"));
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
 
         Parent node = null;
         try {
@@ -73,13 +65,10 @@ public class SortImage implements Initializable {
         });
     }
 
-    //TODO : проверка , что все входящие файлы ТОЛЬКО фото
     private void startPlay() throws IOException {
         if (!inputFiles.isEmpty()) {
-            //BufferedImage bufferedImage = new Denoise().Denoise2(inputFiles, 100);
-           // BufferedImage bufferedImage = new Denoise().Denoise(inputFiles);
-                BufferedImage bufferedImage = new Denoise().DenoiseFromBits(inputFiles);
-            Image image = SwingFXUtils.toFXImage(bufferedImage, null);
+            BufferedImage result = new Denoise().Denoise(inputFiles);
+            Image image = SwingFXUtils.toFXImage(result, null);
             mainFrameImageView.setImage(image);
         }
     }

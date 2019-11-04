@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<SplitPane dividerPositions="0.3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="1028.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_5.SortImage">
+
+<SplitPane dividerPositions="0.3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_5.SortImage">
     <items>
         <VBox prefHeight="448.0" prefWidth="457.0">
             <children>
@@ -29,7 +32,7 @@
                         </Menu>
                     </menus>
                 </MenuBar>
-                <AnchorPane fx:id="anchor" prefHeight="424.0" prefWidth="450.0" />
+                <AnchorPane fx:id="anchor" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="350.0" />
             </children>
         </VBox>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="667.0" style="-fx-background-color: black;">

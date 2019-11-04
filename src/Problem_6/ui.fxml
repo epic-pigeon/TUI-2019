@@ -3,46 +3,47 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_6.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Problem_6.Controller">
     <center>
-        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Original">
+                <Tab text="Оригинал">
                     <content>
-                        <AnchorPane fx:id="originalAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <ImageView fitHeight="350.0" fitWidth="376.0" layoutX="358.0" layoutY="223.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="223.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="358.0" AnchorPane.topAnchor="223.0">
-                                    <image>
-                                        <Image url="@../resources/cloud-storage-uploading-option.png" />
-                                    </image>
-                                </ImageView>
-                            </children></AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Processed">
-                    <content>
-                        <AnchorPane fx:id="processedAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <ImageView fitHeight="350.0" fitWidth="376.0" layoutX="358.0" layoutY="223.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="223.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="358.0" AnchorPane.topAnchor="223.0">
-                                    <image>
-                                        <Image url="@../resources/cloud-storage-uploading-option.png" />
-                                    </image>
-                                </ImageView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            <Tab text="Processed-PRO">
-               <content>
-                  <AnchorPane fx:id="processedProAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <StackPane fx:id="originalPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <ImageView fitHeight="350.0" fitWidth="376.0" layoutX="358.0" layoutY="223.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="223.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="358.0" AnchorPane.topAnchor="223.0">
+                                <ImageView pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="223.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="358.0" AnchorPane.topAnchor="223.0" StackPane.alignment="CENTER">
+                                    <image>
+                                        <Image url="@../resources/cloud-storage-uploading-option.png" />
+                                    </image>
+                                </ImageView>
+                     </children>
+                  </StackPane>
+                    </content>
+                </Tab>
+                <Tab text="Обработка 1">
+                    <content>
+                  <StackPane fx:id="processedPane">
+                     <children>
+                                <ImageView pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <image>
+                                        <Image url="@../resources/cloud-storage-uploading-option.png" />
+                                    </image>
+                                </ImageView>
+                     </children>
+                  </StackPane>
+                    </content>
+                </Tab>
+            <Tab text="Обработка 2">
+               <content>
+                  <StackPane fx:id="processedProPane">
+                     <children>
+                        <ImageView pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="223.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="358.0" AnchorPane.topAnchor="223.0" StackPane.alignment="CENTER">
                            <image>
                               <Image url="@../resources/cloud-storage-uploading-option.png" />
                            </image>
                         </ImageView>
                      </children>
-                  </AnchorPane>
+                  </StackPane>
                </content>
             </Tab>
             </tabs>

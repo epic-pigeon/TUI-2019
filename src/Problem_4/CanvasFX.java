@@ -1,147 +1,183 @@
 package Problem_4;
 
+import Problem_4.TLogParser.TLogPoint;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
 import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CanvasFX extends Application {
+public class CanvasFX extends Application implements Initializable {
+
+    private static final double R = 40_000_000;
+    private static final boolean ASYNC_MODE = true;
+    private static final double EXPECTED_IMAGE_WIDTH = 300*2.2;
+    private static final double EXPECTED_IMAGE_HEIGHT = 160*2.2;
+    private static final int SCROLL_PANE_PADDING = 10;
+
+    @FXML
+    private MenuItem uploadFiles;
+    @FXML
+    private MenuItem run;
+    @FXML
+    private Slider slider;
+    @FXML
+    private Canvas canvas;
+    @FXML
+    private ScrollPane canvasScrollPane;
+
+    private DoubleProperty
+            canvasHeight = new SimpleDoubleProperty(4000),
+            canvasWidth = new SimpleDoubleProperty(4000);
+    private GraphicsContext gc;
+
+    private List<TLogPoint> coordinates;
+    private List<Pair<Image, Long>> photos = new ArrayList<>();
+    private double scale = 0.2;
+    private double delta = 0;
+    private int imgW, imgH;
+    AtomicReference<Double> minX, minY, maxX, maxY;
+
     public static void main(String[] args) {
         Application.launch(args);
     }
 
-    private static final double R = 40_000_000;
-    private List<TLogParser.TLogPoint> coordinates;
-    private List<Pair<Image, Long>> photos = new ArrayList<>();
-    private Button plus_Btn = new Button("+");
-    private Slider slider = new Slider();
-    private Rotate r;
-    private double scale = 0.1;
-    // private
-    private double delta = 0;
-    private Button okBtn = new Button("Start");
-    private DoubleProperty
-            canvasHeight = new SimpleDoubleProperty(4000),
-            canvasWidth  = new SimpleDoubleProperty(4000);
-    private double paneHeight = 800, paneWidth = 1000;
-    private Canvas canvas = new Canvas(canvasWidth.get(), canvasHeight.get());
-    {
-        canvasWidth.bindBidirectional(canvas.widthProperty());
-        canvasHeight.bindBidirectional(canvas.heightProperty());
+    @Override
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/Problem_4/canvas.fxml"));
+        stage.setTitle("Последовательность фото");
+        stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
+        stage.setScene(new Scene(root, 1000, 600));
+        stage.setMaximized(true);
+        stage.show();
     }
-    private GraphicsContext gc = canvas.getGraphicsContext2D();
-    private ScrollPane root;
 
     @Override
-    public void start(Stage stage) throws IOException, InterruptedException {
-        //plus_Btn.setPadding(new Insets(30, 30 , 30, 30));
-        plus_Btn.setTranslateX(100);
-        initSlider();
+    public void initialize(URL location, ResourceBundle resources) {
+        canvas.widthProperty().bindBidirectional(canvasWidth);
+        canvas.heightProperty().bindBidirectional(canvasHeight);
+        gc = canvas.getGraphicsContext2D();
 
-        Pane rootMain = new Pane();
+        uploadFiles.setOnAction(event -> triggerUploadFiles());
+        loadCoordinates();
+        run.setOnAction(event -> drawPictures());
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> scaleCanvas(newValue));
+    }
 
-        root = new ScrollPane(canvas);
-        root.setPrefWidth(paneWidth);
-        root.setPrefHeight(paneHeight);
-        rootMain.getChildren().addAll(root, okBtn, plus_Btn, slider);
-
-        root.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(newValue);
-
-            System.out.println(root.getHeight());
-        });
-
-        // Pane root = new Pane();
-        /*root.setStyle("-fx-padding: 10;" +
-                "-fx-border-style: solid inside;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-insets: 5;" +
-                "-fx-border-radius: 5;" +
-                "-fx-border-color: blue;");*/
-        //  root.getChildren().add(canvas);
-        Scene scene = new Scene(rootMain);
-        stage.setScene(scene);
-        stage.setTitle("Kar");
-        stage.show();
-        String imagePath = "/resources/birds.jpg";
-        // Image image = new Image(imagePath);
-        // Draw the Image
-        coordinates = TLogParser.parseTLog(new File("./src/Problem_4/file.tlog"));
-
+    private void triggerUploadFiles() {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Files");
         fileChooser.setInitialDirectory(new File("./"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
 
-        List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
+        List<File> files = fileChooser.showOpenMultipleDialog(canvas.getScene().getWindow());
+        photos = new ArrayList<>();
         for (File i : files) {
             String s = i.toURI().toString();
-            photos.add(new Pair(new AsyncImage(s), Long.valueOf(s.substring(s.length() - 7, s.length() - 4))));
+            photos.add(new Pair<>(new AsyncImage(s, 400, 300, true, false, true),
+                    Long.valueOf(s.substring(s.length() - 7, s.length() - 4))));
         }
-        AtomicReference<Double> minX = new AtomicReference<>(metersFromDegrees(coordinates.get(0).getLongitude()));
-        AtomicReference<Double> minY = new AtomicReference<>(metersFromDegrees(90 - coordinates.get(0).getLatitude()));
-        AtomicLong c = new AtomicLong(0);
-        okBtn.setOnAction(event -> {
-            for (TLogParser.TLogPoint kar : coordinates
-            ) {
-                minX.set(Math.min(minX.get(), metersFromDegrees(kar.getLongitude())));
-                minY.set(Math.min(minY.get(), metersFromDegrees(90 - kar.getLatitude())));
-            }
-            int w = (int) (300 * scale), h = (int) (160 * scale);
-            for (TLogParser.TLogPoint kar : coordinates) {
-                if (kar.getImgId() == 0) continue;
-                Image image = findImage(kar.getImgId()).getKey();
-                double x = kar.getLongitude(), y = 90 - kar.getLatitude();
-                double imgX = delta + (metersFromDegrees(x) - minX.get()) * scale, imgY = delta + (metersFromDegrees(y) - minY.get()) * scale;
-                Rotate r = new Rotate((180 * (kar.getYaw() - Math.PI)) / Math.PI, w / 2 + imgX, h / 2 + imgY);
-                Rotate finalR = r;
-                ((AsyncImage) image).onLoad(() -> {
-                    gc.setTransform(finalR.getMxx(), finalR.getMyx(), finalR.getMxy(), finalR.getMyy(), finalR.getTx(), finalR.getTy());
-                    gc.drawImage(image, imgX, imgY, w, h);
-                }, true);
-                r = new Rotate((180 * (kar.getYaw() - Math.PI)) / Math.PI, w / 2 + imgX, h / 2 + imgY);
-                gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-                gc.drawImage(image, imgX, imgY, w, h);
-                c.getAndIncrement();
-            }
-        });
-        System.out.println(canvas.getScaleX());
-        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() < -0.9) newValue = -0.9;
-            System.out.println(newValue);
-            //canvas.setTranslateX();
-            //canvas.setTranslateY();
-            double scaleX = newValue.doubleValue() + 1, scaleY = newValue.doubleValue() + 1;
-            canvas.setScaleX(scaleX);
-            canvas.setScaleY(scaleY);
-            canvas.setTranslateX(100 + newValue.doubleValue()*canvas.getWidth()/2);
-            canvas.setTranslateY(100 + newValue.doubleValue()*canvas.getHeight()/2);
-        });
     }
 
-    private Pair<Double, Double> getCanvasCenter() {
-        return new Pair<>(
-                root.getHvalue() * (canvasWidth.get() - paneWidth) + paneWidth / 2,
-                root.getVvalue() * (canvasHeight.get() - paneHeight) + paneHeight / 2
-        );
+    private void loadCoordinates() {
+        coordinates = TLogParser.parseTextFile(new File("./src/Problem_4/resources/tlog_valid_parsed.txt"));
+//        coordinates = TLogParser.parseTLog(new File("./src/Problem_4/resources/file.tlog"));
+
+        minX = new AtomicReference<>(metersFromCoords(coordinates.get(0).getLongitude(), coordinates.get(0).getLatitude()));
+        minY = new AtomicReference<>(metersFromLatitude(90 - coordinates.get(0).getLatitude()));
+        maxX = new AtomicReference<>(0D);
+        maxY = new AtomicReference<>(0D);
+
+        for (TLogPoint kar : coordinates) {
+            minX.set(Math.min(minX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            minY.set(Math.min(minY.get(), metersFromLatitude(90 - kar.getLatitude())));
+            maxX.set(Math.max(maxX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            maxY.set(Math.max(maxY.get(), metersFromLatitude(90 - kar.getLatitude())));
+        }
+    }
+
+    private void drawPictures() {
+        clearCanvas();
+        calculateDrawingParams();
+
+        for (TLogPoint tLogPoint : coordinates) {
+           // System.out.println(tLogPoint.getAltitude());
+            Image image = findImage(tLogPoint.getImgId()).getKey();
+            double altitude = tLogPoint.getAltitude();
+            double x = tLogPoint.getLongitude(),
+                    y = 90 - tLogPoint.getLatitude();
+            double imgX = delta + (metersFromCoords(x, 90-y) - minX.get()) * scale,
+                    imgY = delta + (metersFromLatitude(y) - minY.get()) * scale;
+            double imgWidth = imgW * altitude / 325, imgHeight = imgH * altitude / 325;
+            //System.out.println(tLogPoint.getYaw());
+            Rotate r = new Rotate(tLogPoint.getYaw(), imgWidth / 2 + imgX, imgHeight / 2 + imgY);
+            if (ASYNC_MODE) {
+                ((AsyncImage) image).onLoad(() -> {
+                    gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+                    gc.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+                }, true);
+            } else {
+                gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+                gc.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+            }
+        }
+
+        // Set optimal slider value so that all photos fit to screen.
+        double optimalSliderValue = Math.min((canvasScrollPane.getWidth() - SCROLL_PANE_PADDING) / canvas.getWidth(),
+                ((canvasScrollPane.getHeight() - SCROLL_PANE_PADDING) / canvas.getHeight()));
+        slider.valueProperty().setValue(optimalSliderValue);
+    }
+
+    private void calculateDrawingParams() {
+        Image sampleImage = findImage(coordinates.get(0).getImgId()).getKey();
+        double originalToExpectedRatio = Math.min(sampleImage.getWidth() / EXPECTED_IMAGE_WIDTH,
+                sampleImage.getHeight() / EXPECTED_IMAGE_HEIGHT);
+        int adaptedImgWidth = (int) (originalToExpectedRatio * sampleImage.getWidth());
+        int adaptedImgHeight = (int) (originalToExpectedRatio * sampleImage.getHeight());
+        int maxRotationShift = (int) Math.sqrt(Math.pow(adaptedImgWidth, 2) + Math.pow(adaptedImgHeight, 2));
+
+        scale = Math.min(canvasWidth.doubleValue() / (maxX.get() - minX.get() + 1.5 * maxRotationShift),
+                canvasHeight.doubleValue() / (maxY.get() - minY.get() + 1.5 * maxRotationShift));
+        imgW = (int) (adaptedImgWidth * scale);
+        imgH = (int) (adaptedImgHeight * scale);
+        delta = maxRotationShift * scale / 2;
+    }
+
+    private void clearCanvas() {
+        Rotate zeroAngle = new Rotate(0);
+        gc.setTransform(zeroAngle.getMxx(), zeroAngle.getMyx(), zeroAngle.getMxy(), zeroAngle.getMyy(),
+                zeroAngle.getTx(), zeroAngle.getTy());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
+
+    private void scaleCanvas(Number newValue) {
+        if (newValue.doubleValue() < 0.1) newValue = 0.1;
+        double scaleX = newValue.doubleValue(), scaleY = newValue.doubleValue();
+        canvas.setScaleX(scaleX);
+        canvas.setScaleY(scaleY);
+        canvas.setTranslateX((newValue.doubleValue() - 1) * canvas.getWidth() / 2);
+        canvas.setTranslateY((newValue.doubleValue() - 1) * canvas.getHeight() / 2);
     }
 
     private Pair<Image, Long> findImage(long imgId) {
@@ -150,20 +186,17 @@ public class CanvasFX extends Application {
                 return i;
             }
         }
-        return new Pair<Image, Long>(new AsyncImage("/resources/birds.jpg"), (long) 0);
+        return new Pair<>(new AsyncImage("/resources/birds.jpg", 400, 300, true, false),
+                (long) 0);
     }
 
-    private static double metersFromDegrees(double deg) {
+    private static double metersFromLatitude(double deg) {
         return deg / 90 / 4 * R;
     }
 
-    private void initSlider(){
-        slider.setTranslateY(30);
-        slider.setMin(-1);
-        slider.setMax(1);
-        slider.setValue(0);
-        slider.setShowTickLabels(true);
-        slider.setShowTickMarks(true);
-        slider.setBlockIncrement(1);
+    private static double metersFromCoords(double lon, double lat) {
+        return (lon / 90 / 4 * R)
+                * Math.sin((90 - lat) / 90)
+                ;
     }
 }
