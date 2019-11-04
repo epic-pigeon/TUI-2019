@@ -1,0 +1,6 @@
+use Problem_4.CanvasFX as canvasfx
+use java.lang.System as system
+
+canvasfx::kar()
+system::out.println("tozhe kar")
+// dorova
