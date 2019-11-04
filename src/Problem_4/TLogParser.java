@@ -119,7 +119,7 @@ public class TLogParser {
                     while (hasNext() && !peekNext().name.equals(MAVLINK_UNIX_TIME)) {
                         entry = getNext();
                         if (entry.name.equals(MAVLINK_ALTITUDE)) {
-                            point.altitude = entry.value.doubleValue() / 1_000;
+                            point.altitude = entry.value.doubleValue();
                         } else if (entry.name.equals(MAVLINK_LATITUDE)) {
                             point.latitude = entry.value.doubleValue() / 10_000_000;
                         } else if (entry.name.equals(MAVLINK_LONGITUDE)) {

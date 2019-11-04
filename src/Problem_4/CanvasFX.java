@@ -1,6 +1,7 @@
 package Problem_4;
 
 import Problem_4.TLogParser.TLogPoint;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -31,8 +32,8 @@ public class CanvasFX extends Application implements Initializable {
 
     private static final double R = 40_000_000;
     private static final boolean ASYNC_MODE = true;
-    private static final int EXPECTED_IMAGE_WIDTH = 300;
-    private static final int EXPECTED_IMAGE_HEIGHT = 160;
+    private static final double EXPECTED_IMAGE_WIDTH = 300*2.2;
+    private static final double EXPECTED_IMAGE_HEIGHT = 160*2.2;
     private static final int SCROLL_PANE_PADDING = 10;
 
     @FXML
@@ -103,16 +104,16 @@ public class CanvasFX extends Application implements Initializable {
         coordinates = TLogParser.parseTextFile(new File("./src/Problem_4/resources/tlog_valid_parsed.txt"));
 //        coordinates = TLogParser.parseTLog(new File("./src/Problem_4/resources/file.tlog"));
 
-        minX = new AtomicReference<>(metersFromDegrees(coordinates.get(0).getLongitude()));
-        minY = new AtomicReference<>(metersFromDegrees(90 - coordinates.get(0).getLatitude()));
+        minX = new AtomicReference<>(metersFromCoords(coordinates.get(0).getLongitude(), coordinates.get(0).getLatitude()));
+        minY = new AtomicReference<>(metersFromLatitude(90 - coordinates.get(0).getLatitude()));
         maxX = new AtomicReference<>(0D);
         maxY = new AtomicReference<>(0D);
 
         for (TLogPoint kar : coordinates) {
-            minX.set(Math.min(minX.get(), metersFromDegrees(kar.getLongitude())));
-            minY.set(Math.min(minY.get(), metersFromDegrees(90 - kar.getLatitude())));
-            maxX.set(Math.max(maxX.get(), metersFromDegrees(kar.getLongitude())));
-            maxY.set(Math.max(maxY.get(), metersFromDegrees(90 - kar.getLatitude())));
+            minX.set(Math.min(minX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            minY.set(Math.min(minY.get(), metersFromLatitude(90 - kar.getLatitude())));
+            maxX.set(Math.max(maxX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            maxY.set(Math.max(maxY.get(), metersFromLatitude(90 - kar.getLatitude())));
         }
     }
 
@@ -121,20 +122,24 @@ public class CanvasFX extends Application implements Initializable {
         calculateDrawingParams();
 
         for (TLogPoint tLogPoint : coordinates) {
+           // System.out.println(tLogPoint.getAltitude());
             Image image = findImage(tLogPoint.getImgId()).getKey();
+            double altitude = tLogPoint.getAltitude();
             double x = tLogPoint.getLongitude(),
                     y = 90 - tLogPoint.getLatitude();
-            double imgX = delta + (metersFromDegrees(x) - minX.get()) * scale,
-                    imgY = delta + (metersFromDegrees(y) - minY.get()) * scale;
-            Rotate r = new Rotate((180 * (tLogPoint.getYaw() - Math.PI)) / Math.PI, imgW / 2 + imgX, imgH / 2 + imgY);
+            double imgX = delta + (metersFromCoords(x, 90-y) - minX.get()) * scale,
+                    imgY = delta + (metersFromLatitude(y) - minY.get()) * scale;
+            double imgWidth = imgW * altitude / 325, imgHeight = imgH * altitude / 325;
+            //System.out.println(tLogPoint.getYaw());
+            Rotate r = new Rotate(tLogPoint.getYaw(), imgWidth / 2 + imgX, imgHeight / 2 + imgY);
             if (ASYNC_MODE) {
                 ((AsyncImage) image).onLoad(() -> {
                     gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-                    gc.drawImage(image, imgX, imgY, imgW, imgH);
+                    gc.drawImage(image, imgX, imgY, imgWidth, imgHeight);
                 }, true);
             } else {
                 gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-                gc.drawImage(image, imgX, imgY, imgW, imgH);
+                gc.drawImage(image, imgX, imgY, imgWidth, imgHeight);
             }
         }
 
@@ -185,7 +190,13 @@ public class CanvasFX extends Application implements Initializable {
                 (long) 0);
     }
 
-    private static double metersFromDegrees(double deg) {
+    private static double metersFromLatitude(double deg) {
         return deg / 90 / 4 * R;
+    }
+
+    private static double metersFromCoords(double lon, double lat) {
+        return (lon / 90 / 4 * R)
+                * Math.sin((90 - lat) / 90)
+                ;
     }
 }
