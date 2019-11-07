@@ -29,6 +29,7 @@ public class ImgProcessingUtils {
         for (int x = 0; x < srcImg.getWidth(); ++x) {
             for (int y = 0; y < srcImg.getHeight(); ++y) {
                 javafx.scene.paint.Color color = srcFxImg.getPixelReader().getColor(x, y);
+                //FIXME: подкорректировать фильтр
                 boolean pixelMatches = color.getGreen() > 0.5 && color.getRed() < color.getGreen()
                         && color.getBlue() < color.getRed();
                 filteredImg.setRGB(x, y, pixelMatches ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
@@ -87,7 +88,7 @@ public class ImgProcessingUtils {
         List<MatOfPoint> bestContours = areaToContour.stream().map(Pair::getValue).limit(bestContoursNumber)
                 .collect(Collectors.toList());
 //        Use fillPoly if you want to highlight inner part of contours as well.
-        Imgproc.fillPoly(outputMat, bestContours, new Scalar(0, 0, 255));
+        Imgproc.fillPoly(outputMat, bestContours, new Scalar(255, 0, 0));
 
         for (int contourIdx = 0; contourIdx < bestContours.size(); contourIdx++) {
             Imgproc.drawContours(outputMat, bestContours, contourIdx, new Scalar(255, 255, 255));

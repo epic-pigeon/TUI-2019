@@ -1,5 +1,6 @@
 package Problem_1;
 
+import Problem_4.Collection;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -13,9 +14,8 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Controller implements Initializable {
     //1, 2, 2, 1, 10.1, 14.1
@@ -39,8 +39,9 @@ public class Controller implements Initializable {
     ) {
         double[] a = calculate(focusDistance, photoCensorHeight, photoCensorWidth, height);
         invokeMapWindow(
-                calculateRoute(a[0], a[1], fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge), fieldHeight, fieldWidth, southWest, diameter
+                calculatePhotoCoords(a[0], a[1], fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge), fieldHeight, fieldWidth, southWest, diameter
         );
+
     }
 
     public static double calculateCharge(double[][] route, double chargePerPhoto, double chargePerMeter) {
@@ -71,7 +72,7 @@ public class Controller implements Initializable {
         return new double[] {groundHeight, groundWidth};
     }
 
-    public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
+    /*public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
         RouteCalculator routeCalculator = new RouteCalculator(photoHeight, photoWidth, fieldHeight, fieldWidth);
         int h = routeCalculator.getHeight();
         int w = routeCalculator.getWidth();
@@ -152,6 +153,78 @@ public class Controller implements Initializable {
             }
             return calculateRoute(photoHeight, photoWidth, fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge);
         }
+    }*/
+
+    public static double[][] calculatePhotoCoords(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
+        Collection<double[]> result = new Collection<>();
+        Collection<double[]> rows = new Collection<>(
+                new double[] { 0, fieldWidth, 0 }
+        );
+        //System.out.println(rows.toString(double[].class));
+        while ((rows = rows.filter(val -> val[2] < fieldHeight)).size() > 0) {
+            //System.out.println(rows.toString(double[].class));
+            double[] toFill = rows.qsort(Comparator.comparingDouble(o1 -> o1[2])).get(0);
+            //System.out.println(Arrays.toString(toFill));
+            int index = rows.indexOf(toFill);
+            int[] splitRes = splitRow(toFill[1], photoHeight, photoWidth);
+            //System.out.println(Arrays.toString(splitRes));
+            rows = rows.splice(index, index + 1).insert(new Collection<>(
+                    splitRes[0] > 0 ? new double[] { toFill[0], splitRes[0] * photoHeight, toFill[2] + photoWidth } : null,
+                    splitRes[1] > 0 ? new double[] { toFill[0] + splitRes[0] * photoHeight, toFill[1] - splitRes[0] * photoHeight, toFill[2] + photoHeight } : null
+            ).filter(Objects::nonNull), index);
+            //System.out.println(Arrays.toString(splitRes));
+            //System.out.println(rows.splice(index, index + 1));
+            for (int i = 0; i < splitRes[0]; i++) {
+                result.add(
+                        new double[] {
+                                toFill[0] + (i + 0.5) * photoHeight,
+                                toFill[2] + photoWidth * 1/2,
+                                0
+                        }
+                );
+            }
+            for (int i = 0; i < splitRes[1]; i++) {
+                result.add(
+                        new double[] {
+                                toFill[0] + splitRes[0] * photoHeight + (i + 0.5) * photoWidth,
+                                toFill[2] + photoHeight * 1/2,
+                                1
+                        }
+                );
+            }
+            //System.out.println(rows.toString(double[].class));
+        }
+        //System.out.println(result);
+        return result.array(double[].class);
+    }
+
+    public static double[][] sortCoords(double[][] photoCoords) {
+        return null;
+    }
+
+    private static int[] splitRow(double length, double __l1, double __l2) {
+        double l1 = Math.max(__l1, __l2);
+        double l2 = Math.min(__l1, __l2);
+        int[] minSum = null;
+        //System.out.println(length);
+        //System.out.println(l1);
+        //System.out.println(l2);
+        for (int i = 0; (i - 1) * l1 < length; i++) {
+            double l1Length = i * l1;
+            if (l1Length >= length) {
+                if ((minSum == null || i < (minSum[0] + minSum[1]))) {
+                    minSum = new int[] {i, 0};
+                }
+            } else {
+                int l2Count = (int) Math.ceil((length - l1Length) / l2);
+                if ((minSum == null || (i + l2Count) < (minSum[0] + minSum[1]))) {
+                    minSum = new int[] {i, l2Count};
+                }
+            }
+            //System.out.println(i);
+            //System.out.println(lost);
+        }
+        return l1 == __l1 ? minSum : (minSum != null ? new int[] { minSum[1], minSum[0] } : null);
     }
 
     private static double[][] invertCoords(double[][] route) {
@@ -358,6 +431,8 @@ public class Controller implements Initializable {
                     15
             );
 
+            controller.getMapView().setPostUpdate(false);
+
             controller.getMapView().onload(() -> {
                 controller.getMapView().setLineWidth(5);
                 controller.getMapView().strokeRect(
@@ -497,6 +572,7 @@ public class Controller implements Initializable {
                 }
                 controller.getMapView().closePath();
                 controller.getMapView().strokePath();
+                controller.getMapView().update();
             });
         } catch (Exception e) {
             e.printStackTrace();

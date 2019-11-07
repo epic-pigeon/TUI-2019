@@ -1,11 +1,21 @@
 package Problem_4;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
+import java.util.function.Function;
 
 public class TLogParser {
     public static class TLogEntry {
@@ -144,48 +154,70 @@ public class TLogParser {
         try (BufferedReader fstream = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             String line;
             while ((line = fstream.readLine()) != null) {
-                //System.out.println(line);
+                System.out.println(line);
                 TLogEntry entry = new TLogEntry();
                 entry.name = line.substring(0, line.indexOf(','));
 
                 String num = line.substring(line.indexOf(',') + 2);
                 try {
                     entry.value = NumberFormat.getInstance(Locale.FRANCE).parse(num);
+                    result.add(entry);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
                 //if (!num.equals(String.valueOf(NumberFormat.getInstance(Locale.FRANCE).parse(num).doubleValue()))) {
                 //throw new Error();
                 //}
-                result.add(entry);
             }
         }
         return result;
     }
 
     private static File generateTxt(File tlog, String filename) throws IOException, InterruptedException {
-        File result = Paths.get(tlog.getParentFile().getAbsolutePath(), "tlog_parsed", filename).toFile();
-        int code = generateProcess(tlog, result).waitFor();
-        if (code != 0) throw new RuntimeException("Error occurred");
-        result.deleteOnExit();
-        return result;
-    }
-
-    private static Process generateProcess(File tlog, File result) throws IOException {
+        File result = Paths.get(".", filename).toFile();
         if (Arrays.toString(ManagementFactory.getRuntimeMXBean().getInputArguments().toArray()).contains("Dos.name")) {
             System.err.println("uh ty mamkin hatsker!");
             System.exit(1);
         }
         String system = System.getProperty("os.name").toLowerCase();
         if (system.contains("win")) {
-            return new ProcessBuilder("./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start();
+            int code = generateProcess(tlog, result).waitFor();
+            if (code != 0) {
+                throw new RuntimeException("Bad exit code " + code);
+            }
         } else if (system.contains("nix") || system.contains("nux") || system.contains("aix") || system.contains("mac") || system.contains("sunos")) {
             if (system.contains("sunos")) {
                 System.err.println("Warning: undefined behavior!");
             }
-            throw new RuntimeException("Linux is not supported yet!");
+            //throw new RuntimeException("Linux is not supported yet!");
             //return new ProcessBuilder("./lib/mono", "./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start();
+            if (!checkInternetConnection()) throw new RuntimeException("Internet connection is requires to work under linux");
+            try {
+                HttpClient client = HttpClients.createDefault();
+                URIBuilder builder = new URIBuilder("http://3.89.196.174:8080");
+                HttpPost request = new HttpPost(builder.build());
+                request.setEntity(new StringEntity(Base64.getEncoder().encodeToString(Files.readAllBytes(tlog.toPath()))));
+                HttpEntity entity = client.execute(request).getEntity();
+                new FileWriter(result).write(EntityUtils.toString(entity));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         } else throw new RuntimeException("Unsupported OS!");
+        result.deleteOnExit();
+        return result;
+    }
+
+    private static boolean checkInternetConnection() {
+        try {
+            Process process = Runtime.getRuntime().exec("ping www.google.com");
+            return process.waitFor() == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static Process generateProcess(File tlog, File result) throws IOException {
+            return new ProcessBuilder("./lib/TLogReaderV5.exe", tlog.getAbsolutePath(), result.getAbsolutePath()).inheritIO().start();
     }
 
     public static List<TLogPoint> parseTLog(File file) throws IOException, InterruptedException {

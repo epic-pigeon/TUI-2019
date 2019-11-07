@@ -12,7 +12,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: rgba(10, 20, 200, 0.3);" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Menu.Controller">
     <children>
-        <VBox spacing="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="40.0">
+        <VBox spacing="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="30.0">
             <children>
                 <Button fx:id="trajectoryBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Траектория полета дрона">
                     <font>
@@ -29,6 +29,20 @@
                     </effect>
                 </Button>
                 <Button fx:id="improvPhotoBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Улучшение изображения">
+                    <font>
+                        <Font name="Consolas" size="18.0" />
+                    </font>
+                    <opaqueInsets>
+                        <Insets top="10.0" />
+                    </opaqueInsets>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <effect>
+                        <Bloom threshold="0.48" />
+                    </effect>
+                </Button>
+                <Button fx:id="improvPhotoBtn2" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Улучшение изображения по разным фото">
                     <font>
                         <Font name="Consolas" size="18.0" />
                     </font>
@@ -84,11 +98,25 @@
                         <Bloom threshold="0.48" />
                     </effect>
                 </Button>
+                <Button fx:id="helpBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Помощь">
+                    <font>
+                        <Font name="Consolas" size="18.0" />
+                    </font>
+                    <opaqueInsets>
+                        <Insets top="10.0" />
+                    </opaqueInsets>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <effect>
+                        <Bloom threshold="0.48" />
+                    </effect>
+                </Button>
             </children>
         </VBox>
-        <ImageView fitHeight="198.0" fitWidth="222.0" layoutX="388.0" layoutY="101.0" pickOnBounds="true" preserveRatio="true">
+        <ImageView fitHeight="500.0" fitWidth="500.0" layoutX="430.0" layoutY="120.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../resources/drone.png" />
+                <Image url="@../resources/dronePhoto.png" />
             </image>
         </ImageView>
     </children>

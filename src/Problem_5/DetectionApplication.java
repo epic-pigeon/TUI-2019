@@ -33,7 +33,7 @@ public class DetectionApplication extends Application {
 
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Files");
-        fileChooser.setInitialDirectory(new File("C:/Users/Tony/Desktop/TUI-2019(2)"));
+        fileChooser.setInitialDirectory(new File("C:/Users/"));
         fileChooser.getExtensionFilters().addAll(//
                 //new FileChooser.ExtensionFilter("All Files", "*.*"),
                 new FileChooser.ExtensionFilter("JPG", "*.jpg"),

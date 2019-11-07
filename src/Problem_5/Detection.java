@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.ArrayList;
 
 public class Detection {
-    private static final String key1 = "c481d76545e74a14b3914092fcece70b";
+    private static final String key1 = "8d3e12ed7ffe417a876f2f53794122b5";
     private static final String key2 = "0e1bbf08e0b04d86bdea106e0110a766";
 
     private static ArrayList<ArrayList<String>> objects = new ArrayList<>();
@@ -30,7 +30,13 @@ public class Detection {
         add("car");
         add("mammal");
         add("person");
+        add("Van");
+        add("cat");
+        add("dog");
+        add("race car");
+        add("Land vehicle");
     }};
+    private static ArrayList<ObjectForDetection> objectForDetections = new ArrayList<>();
 
     public Detection() {
     }
@@ -47,8 +53,8 @@ public class Detection {
             request.setHeader("Content-Type", "application/octet-stream");
             request.setHeader("Ocp-Apim-Subscription-Key", key1);
 
-            FileEntity reqEntity = new FileEntity(file);
-            request.setEntity(reqEntity);
+            //FileEntity reqEntity = new FileEntity(file);
+            //request.setEntity(reqEntity);
 
             FileEntity reqEntityF = new FileEntity(file, ContentType.APPLICATION_OCTET_STREAM);
 
@@ -87,11 +93,16 @@ public class Detection {
 
                     obj.add(kar.get(0));
                     String s = "";
+                    //TODO: сделать проверку на то, что объект с таким именем и координатами существует
+                    //TODO: в противном случае назначаем его новым объектом, если новый обект и пропал другой обект - назначаем его старым но движущимся
                     if (objects.isEmpty()){
+                        objectForDetections.add(new ObjectForDetection(kar.get(0), x , y , w , h));
                         s = "new object";
                     }else if (arrayListCopy.indexOf(kar.get(0)) != -1){
+
                         arrayListCopy.remove(arrayListCopy.indexOf(kar.get(0)));
                     }else{
+                        objectForDetections.add(new ObjectForDetection(kar.get(0), x , y , w , h));
                         s = "new object";
                     }
                     if (runObj.indexOf(kar.get(0)) != -1){
@@ -109,25 +120,17 @@ public class Detection {
                     graphics.drawRect(x + w - 1, y, 1, h);
                     graphics.drawRect(x, y + h - 1, w, 1);
 
-                    graphics.setColor(Color.BLUE);
-                    //font size == 24
                     graphics.setFont(new Font("TimesRoman", Font.PLAIN, bufferedImage.getWidth()/30));
                     if (graphics instanceof Graphics2D) {
                         Graphics2D g2 = (Graphics2D) graphics;
-                        //g2.setFont(new Font("TimesRoman", Font.PLAIN, 150));
                         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
-                        g2.drawString((kar.get(0) + " " + s), x, y + h);// + graphics.getFont().getSize());
+                        String temp = kar.get(0) + " " + s;
+                        g2.setColor(Color.WHITE);
+                        g2.fillRect(x , y + h - 20, temp.length()*bufferedImage.getWidth()/61 , 20);
+                        g2.setColor(new Color(38, 0 , 225));
+                        g2.drawString(temp , x, y + h);// + graphics.getFont().getSize());
                     }
-                    /*
-                    for (int j = x; j < x + w; ++j) {
-                      bufferedImage.setRGB(j, y + 1 , Color.RED.getRGB());
-                      bufferedImage.setRGB(j, y + h - 1, Color.RED.getRGB());
-                    }
-                    for (int j = y; j < y + h; ++j) {
-                      bufferedImage.setRGB(x + 1, j, Color.RED.getRGB());
-                      bufferedImage.setRGB(x + w - 1, j, Color.RED.getRGB());
-                     }*/
                 }
                 System.out.println(obj);
                 objects.add(obj);
