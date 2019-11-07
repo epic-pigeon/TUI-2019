@@ -1,6 +1,7 @@
 package Menu;
 
 import Problem_1.MapView;
+import Problem_4.CanvasFX;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -31,23 +32,29 @@ public class Controller implements Initializable {
     private Button trajectoryBtn;
     @FXML
     private Button improvPhotoBtn;
-   // @FXML
-   // private Button problem3Btn;
+    @FXML
+    private Button improvPhotoBtn2;
     @FXML
     private Button chronologyBtn;
     @FXML
     private Button objectDetectionBtn;
     @FXML
     private Button wateringBtn;
+    @FXML
+    private Button helpBtn;
+    @FXML
+    private ImageView imageView;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         trajectoryBtn.setOnAction(event -> openWindow(1));
         improvPhotoBtn.setOnAction(event -> openWindow(2));
-       // problem3Btn.setOnAction(event -> openWindow(3));
+        improvPhotoBtn2.setOnAction(event -> openWindow(3));
         chronologyBtn.setOnAction(event -> openWindow(4));
         objectDetectionBtn.setOnAction(event -> openWindow(5));
         wateringBtn.setOnAction(event -> openWindow(6));
+        helpBtn.setOnAction(event -> openWindow(7));
+
     }
 
     private void openWindow(int number){
@@ -65,16 +72,18 @@ public class Controller implements Initializable {
                     stage.setScene(new Scene(root, 1900, 960));
                     break;
                 case 3:
-                    stage.setTitle("Задача 3");
-                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_4/sortImages.fxml"));
+                    stage.setTitle("Улучшение изображения по разным фото");
+                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_3/sortImages.fxml"));
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
                     stage.setScene(new Scene(root, 1900, 960));
                     break;
                 case 4:
-                    stage.setTitle("Хронолигечская последовательность");
+                  /*  stage.setTitle("Хронолигечская последовательность");
                     root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_4/sortImages.fxml"));
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
-                    stage.setScene(new Scene(root, 1900, 960));
+                    stage.setScene(new Scene(root, 1900, 960));*/
+                    CanvasFX canvasFX = new CanvasFX();
+                    canvasFX.start(stage);
                     break;
                 case 5:
                     stage.setTitle("Распознавание ситуации на фото");
@@ -88,9 +97,17 @@ public class Controller implements Initializable {
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
                     stage.setScene(new Scene(root, 1066, 850));
                     break;
+                case 7:
+                    stage.setTitle("Помощь");
+                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_6/ui.fxml"));
+                    stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
+                    stage.setScene(new Scene(root, 1066, 850));
+                    break;
             }
             stage.show();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
