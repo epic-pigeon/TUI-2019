@@ -71,7 +71,7 @@ public class Controller implements Initializable {
         return new double[] {groundHeight, groundWidth};
     }
 
-    public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
+    /*public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
         RouteCalculator routeCalculator = new RouteCalculator(photoHeight, photoWidth, fieldHeight, fieldWidth);
         int h = routeCalculator.getHeight();
         int w = routeCalculator.getWidth();
@@ -152,6 +152,10 @@ public class Controller implements Initializable {
             }
             return calculateRoute(photoHeight, photoWidth, fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge);
         }
+    }*/
+
+    private static double[][] calculatePhotoCoords(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
+        return null;
     }
 
     private static double[][] invertCoords(double[][] route) {

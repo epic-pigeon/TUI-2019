@@ -151,7 +151,7 @@ public class CanvasFX extends Application implements Initializable {
 
         // Set optimal slider value so that all photos fit to screen.
         double optimalSliderValue = Math.min((canvasScrollPane.getWidth() - SCROLL_PANE_PADDING) / canvas.getWidth(),
-                Math.min((canvasScrollPane.getHeight() - SCROLL_PANE_PADDING), canvas.getHeight()));
+                ((canvasScrollPane.getHeight() - SCROLL_PANE_PADDING) / canvas.getHeight()));
         slider.valueProperty().setValue(optimalSliderValue);
     }
 
