@@ -15,8 +15,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/Menu/ui.fxml"));
         primaryStage.setTitle("Menu");
-      //  primaryStage.getIcons().add(new Image("src/Menu/drone.png"));
-        primaryStage.setScene(new Scene(root, 600, 400));
+          primaryStage.getIcons().add(new Image("/Menu/drone.png"));
+      //  root.setStyle("-fx-background-color:rgba(0, 255, 0 , 0.3)");
+        primaryStage.setScene(new Scene(root, 930, 500));
         primaryStage.show();
     }
 

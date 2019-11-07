@@ -36,6 +36,8 @@ public class CanvasFX extends Application implements Initializable {
     private static final double EXPECTED_IMAGE_HEIGHT = 160*2.2;
     private static final int SCROLL_PANE_PADDING = 10;
 
+    private static File tlogFile;
+
     @FXML
     private MenuItem uploadFiles;
     @FXML
@@ -89,12 +91,16 @@ public class CanvasFX extends Application implements Initializable {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Files");
         fileChooser.setInitialDirectory(new File("./"));
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo", "*.jpg", "*.png"));
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Photo and TLOG", "*.jpg", "*.png","*.tlog"));
 
         List<File> files = fileChooser.showOpenMultipleDialog(canvas.getScene().getWindow());
         photos = new ArrayList<>();
         for (File i : files) {
             String s = i.toURI().toString();
+            if (s.endsWith(".tlog")){
+                tlogFile = i;
+                continue;
+            }
             photos.add(new Pair<>(new AsyncImage(s, 400, 300, true, false, true),
                     Long.valueOf(s.substring(s.length() - 7, s.length() - 4))));
         }
@@ -195,8 +201,20 @@ public class CanvasFX extends Application implements Initializable {
     }
 
     private static double metersFromCoords(double lon, double lat) {
-        return (lon / 90 / 4 * R)
-                * Math.sin((90 - lat) / 90)
+        return (lon / 90.0 / 4 * R)
+                * Math.sin((90.0 - lat) / 90.0)
+
                 ;
     }
+
+
+    private static final double Rz = 6371000;
+
+   /* private static double metersFromLatitude(double deg) {
+        return Rz*Math.log(Math.tan(Math.PI*(90 + deg)/360));
+    }
+
+    private static double metersFromCoords(double lon, double lat) {
+        return Rz*lon*Math.PI/180;
+    }*/
 }
