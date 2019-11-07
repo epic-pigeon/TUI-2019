@@ -154,27 +154,27 @@ public class TLogParser {
         try (BufferedReader fstream = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             String line;
             while ((line = fstream.readLine()) != null) {
-                //System.out.println(line);
+                System.out.println(line);
                 TLogEntry entry = new TLogEntry();
                 entry.name = line.substring(0, line.indexOf(','));
 
                 String num = line.substring(line.indexOf(',') + 2);
                 try {
                     entry.value = NumberFormat.getInstance(Locale.FRANCE).parse(num);
+                    result.add(entry);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
                 //if (!num.equals(String.valueOf(NumberFormat.getInstance(Locale.FRANCE).parse(num).doubleValue()))) {
                 //throw new Error();
                 //}
-                result.add(entry);
             }
         }
         return result;
     }
 
     private static File generateTxt(File tlog, String filename) throws IOException, InterruptedException {
-        File result = Paths.get(tlog.getParentFile().getAbsolutePath(), "tlog_parsed", filename).toFile();
+        File result = Paths.get(".", filename).toFile();
         if (Arrays.toString(ManagementFactory.getRuntimeMXBean().getInputArguments().toArray()).contains("Dos.name")) {
             System.err.println("uh ty mamkin hatsker!");
             System.exit(1);

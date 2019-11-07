@@ -141,10 +141,12 @@ public class SortImage implements Initializable {
     }
 
     private void startPlay(){
+        frameBox.getChildren().clear();
         if (!inputFiles.isEmpty()) {
            /// for (int i = 0; i < objects.size(); i++) {
            //     System.out.println(objects.get(i) + " " + status.get(i));
          //   }
+            images.clear();
             currentElem = 0;
             for (File file : inputFiles) {
                 BufferedImage bufferedImage = (new Detection()).Detection(file);
@@ -174,7 +176,9 @@ public class SortImage implements Initializable {
     }
 
     private void startPlayWith(){
+        frameBox.getChildren().clear();
         if (!inputFiles.isEmpty()) {
+            images.clear();
             for (File file : inputFiles) {
                 BufferedImage bufferedImage = (new Detection()).Detection(file);
                 VBox vBox = new VBox();

@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,6 @@ public class CanvasFX extends Application implements Initializable {
         gc = canvas.getGraphicsContext2D();
 
         uploadFiles.setOnAction(event -> triggerUploadFiles());
-        loadCoordinates();
         run.setOnAction(event -> drawPictures());
         slider.valueProperty().addListener((observable, oldValue, newValue) -> scaleCanvas(newValue));
     }
@@ -107,8 +107,14 @@ public class CanvasFX extends Application implements Initializable {
     }
 
     private void loadCoordinates() {
-        coordinates = TLogParser.parseTextFile(new File("./src/Problem_4/resources/tlog_valid_parsed.txt"));
-//        coordinates = TLogParser.parseTLog(new File("./src/Problem_4/resources/file.tlog"));
+       // coordinates = TLogParser.parseTextFile(new File("./src/Problem_4/resources/tlog_valid_parsed.txt"));
+        try {
+            coordinates = TLogParser.parseTLog(tlogFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         minX = new AtomicReference<>(metersFromCoords(coordinates.get(0).getLongitude(), coordinates.get(0).getLatitude()));
         minY = new AtomicReference<>(metersFromLatitude(90 - coordinates.get(0).getLatitude()));
@@ -124,6 +130,7 @@ public class CanvasFX extends Application implements Initializable {
     }
 
     private void drawPictures() {
+        loadCoordinates();
         clearCanvas();
         calculateDrawingParams();
 
