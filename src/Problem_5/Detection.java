@@ -47,8 +47,8 @@ public class Detection {
             request.setHeader("Content-Type", "application/octet-stream");
             request.setHeader("Ocp-Apim-Subscription-Key", key1);
 
-            FileEntity reqEntity = new FileEntity(file);
-            request.setEntity(reqEntity);
+            //FileEntity reqEntity = new FileEntity(file);
+            //request.setEntity(reqEntity);
 
             FileEntity reqEntityF = new FileEntity(file, ContentType.APPLICATION_OCTET_STREAM);
 

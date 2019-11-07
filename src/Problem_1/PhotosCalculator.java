@@ -31,9 +31,17 @@ public class PhotosCalculator {
 
     private void optimizeRoute() {
         List<Coords> newRoute = new ArrayList<>();
+        //System.out.println("kar");
+        //System.out.println(getElement(-1));
         for (int i = 0; i < route.size(); i++) {
-            if (getTan(getElement(i - 1), getElement(i)) != getTan(getElement(i), getElement(i + 1)))
+            double tan1 = getTan(getElement(i - 1), getElement(i));
+            double tan2 = getTan(getElement(i), getElement(i + 1));
+            //System.out.println(tan1);
+            //System.out.println(tan2);
+            if (tan1 != tan2 && !(getElement(i - 1).equals(getElement(i))) && !(getElement(i).equals(getElement(i + 1))) && !(Double.isNaN(tan1) && Double.isNaN(tan2))) {
                 newRoute.add(getElement(i));
+                //System.out.println(getElement(i));
+            }
         }
         route = newRoute;
     }
@@ -156,7 +164,10 @@ public class PhotosCalculator {
             }
         }
         route = newRoute;
+        System.out.println("kar");
+        System.out.println(route);
         optimizeRoute();
+        System.out.println(route);
     }
 
     private int getContainingSide(Coords coords) {

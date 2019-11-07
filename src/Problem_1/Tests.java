@@ -74,6 +74,13 @@ public class Tests {
         optimizationTests.put(
                 Arrays.asList(
                         new PhotosCalculator.Coords(0, 3),
+                        new PhotosCalculator.Coords(2, 3)
+                ),
+                Collections.emptyList()
+        );
+        optimizationTests.put(
+                Arrays.asList(
+                        new PhotosCalculator.Coords(0, 3),
                         new PhotosCalculator.Coords(1, 1),
                         new PhotosCalculator.Coords(2, 3),
                         new PhotosCalculator.Coords(4, 7)
@@ -172,6 +179,21 @@ public class Tests {
                         new PhotosCalculator.Coords(3, 4),
                         new PhotosCalculator.Coords(0, 1)
                 )
+        );
+        cutTests.put(
+                new CutTest(
+                        Arrays.asList(
+                                new PhotosCalculator.Coords(0, 0),
+                                new PhotosCalculator.Coords(2, 0),
+                                new PhotosCalculator.Coords(2, 3),
+                                new PhotosCalculator.Coords(0, 3)
+                        ),
+                        0,
+                        2,
+                        4,
+                        0
+                ),
+                Collections.emptyList()
         );
     }
 
