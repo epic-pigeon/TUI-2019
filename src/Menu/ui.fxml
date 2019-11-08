@@ -84,7 +84,7 @@
                         <Bloom threshold="0.48" />
                     </effect>
                 </Button>
-                <Button fx:id="wateringBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Полив полей на фото">
+                <Button fx:id="wateringBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Полив поля">
                     <font>
                         <Font name="Consolas" size="18.0" />
                     </font>
@@ -98,7 +98,7 @@
                         <Bloom threshold="0.48" />
                     </effect>
                 </Button>
-                <Button fx:id="helpBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Помощь">
+                <Button fx:id="helpBtn" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: rgb(0,0,255); -fx-border-radius: 10; -fx-border-width: 2;" text="Инструкция">
                     <font>
                         <Font name="Consolas" size="18.0" />
                     </font>

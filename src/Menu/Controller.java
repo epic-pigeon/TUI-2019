@@ -1,7 +1,9 @@
 package Menu;
 
+import Problem_1.Main;
 import Problem_1.MapView;
 import Problem_4.CanvasFX;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -92,13 +94,13 @@ public class Controller implements Initializable {
                     stage.setScene(new Scene(root, 1450, 1000));
                     break;
                 case 6:
-                    stage.setTitle("Полив полей");
+                    stage.setTitle("Полив поля");
                     root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_6/ui.fxml"));
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
                     stage.setScene(new Scene(root, 1066, 850));
                     break;
                 case 7:
-                    stage.setTitle("Помощь");
+                    stage.setTitle("Соси бибу");
                     root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_6/ui.fxml"));
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
                     stage.setScene(new Scene(root, 1066, 850));
@@ -122,67 +124,12 @@ public class Controller implements Initializable {
 
 
     private void startFirst(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
-        primaryStage.setTitle("Enter the data");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
-        primaryStage.show();
-        pane = new Pane();
-        labels.add(new Label("Enter focus Distance"));
-        labels.add(new Label("Enter photo censor height"));
-        labels.add(new Label("Enter photo censor width"));
-        labels.add(new Label("Enter height"));
-        labels.add(new Label("Enter field height"));
-        labels.add(new Label("Enter field width"));
-        labels.add(new Label("Enter field latitude"));
-        labels.add(new Label("Enter field longitude"));
-        labels.add(new Label("Enter field diagonal"));
-        labels.add(new Label("Charge per photo"));
-        labels.add(new Label("Charge per meter"));
-        labels.add(new Label("Max energy"));
-
-        vbox = new VBox(vgap);
-        vbox.setPadding(new Insets(10 ,10 ,10 ,10));
-
-        for (int i = 0; i < 12; i++) {
-            TextField temp = new TextField();
-            if (i == 6) temp.setText("50.467977");
-            if (i == 7) temp.setText("31.211438");
-            if (i == 8) temp.setText("0.01");
-            temp.addEventFilter(KeyEvent.KEY_TYPED, keyEvent -> {
-                try {
-                    Float.valueOf(temp.getText() + keyEvent.getCharacter());
-                }catch (Exception e){
-                    keyEvent.consume();
-                }
-            });
-            textFields.add(temp);
-
-            HBox hBox = new HBox(hgap, labels.get(i), textFields.get(i));
-            vbox.getChildren().add(hBox);
-        }
-        okBtn = new Button("Enter");
-        vbox.getChildren().add(okBtn);
-        pane.getChildren().add(vbox);
-        primaryStage.setScene(new Scene(pane));
-
-        okBtn.setOnAction(event -> {
-            Problem_1.Controller.createMapWindow(
-                    Float.valueOf(textFields.get(0).getText()),
-                    Float.valueOf(textFields.get(1).getText()),
-                    Float.valueOf(textFields.get(2).getText()),
-                    Float.valueOf(textFields.get(3).getText()),
-                    Float.valueOf(textFields.get(4).getText()),
-                    Float.valueOf(textFields.get(5).getText()),
-                    new MapView.LatLng(
-                            Float.valueOf(textFields.get(6).getText()),
-                            Float.valueOf(textFields.get(7).getText())
-                    ),
-                    Float.valueOf(textFields.get(8).getText()),
-                    Float.valueOf(textFields.get(9).getText()),
-                    Float.valueOf(textFields.get(10).getText()),
-                    Float.valueOf(textFields.get(11).getText())
-            );
+        Platform.runLater(() -> {
+            try {
+                new Main().start(primaryStage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 }
