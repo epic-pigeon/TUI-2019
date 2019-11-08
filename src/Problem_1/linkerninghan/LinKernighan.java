@@ -6,9 +6,6 @@ import java.util.Random;
 public class LinKernighan {
     //The instance variables definitions
 
-    // The ids of all the cities (sorted)
-    private ArrayList<Integer> ids;
-
     // The coordinates of all the cities
     private ArrayList<Point> coordinates;
 
@@ -26,12 +23,10 @@ public class LinKernighan {
      * the optimizations. (Basically the tour it has is the drunken sailor)
      *
      * @param coordinates ArrayList<t4.linkerninghan.Point> the coordinates of all the cities
-     * @param ids         ArrayList<Integer> the id of all the cities
      */
-    public LinKernighan(ArrayList<Point> coordinates, ArrayList<Integer> ids) {
-        this.ids = ids;
+    public LinKernighan(ArrayList<Point> coordinates) {
         this.coordinates = coordinates;
-        this.size = ids.size();
+        this.size = coordinates.size();
         this.tour = createRandomTour();
         this.distanceTable = initDistanceTable();
 

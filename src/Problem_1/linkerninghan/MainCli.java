@@ -13,23 +13,22 @@ public class MainCli {
         // If either width or height is even, min distance to visit all points is [width * height].
         // If both width and height are odd, min distance is [width * height - 1 + sqrt(2)].
         ArrayList<Point> coordinates = generateGridPoints(5, 5);
-        ArrayList<Integer> ids = new ArrayList<>(Stream.iterate(1, i -> i + 1).limit(coordinates.size())
-                .collect(Collectors.toList()));
+        //ArrayList<Integer> ids = Stream.iterate(1, i -> i + 1).limit(coordinates.size()).collect(Collectors.toCollection(ArrayList::new));
 
         // Time tracking.
         long startTime = System.currentTimeMillis();
 
-        LinKernighan result = runLinKernighan(coordinates, ids);
+        LinKernighan result = runLinKernighan(coordinates);
 
         System.out.printf("The solution took: %dms\n", System.currentTimeMillis() - startTime);
         System.out.println("The solution is: ");
         System.out.println(result);
     }
 
-    public static LinKernighan runLinKernighan(ArrayList<Point> coordinates, ArrayList<Integer> ids) {
-        LinKernighan bestResult = new LinKernighan(coordinates, ids);
+    public static LinKernighan runLinKernighan(ArrayList<Point> coordinates) {
+        LinKernighan bestResult = new LinKernighan(coordinates);
         for (int i = 0; i < ITERATIONS_NUM; i++) {
-            LinKernighan lk = new LinKernighan(coordinates, ids);
+            LinKernighan lk = new LinKernighan(coordinates);
             lk.runAlgorithm();
             if (lk.getDistance() < bestResult.getDistance()) {
                 bestResult.tour = lk.tour.clone();

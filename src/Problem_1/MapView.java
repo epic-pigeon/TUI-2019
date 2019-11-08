@@ -426,6 +426,14 @@ public class MapView extends Region {
             this.latitude = latitude;
             this.longitude = longitude;
         }
+
+        @Override
+        public String toString() {
+            return "LatLng{" +
+                    "latitude=" + latitude +
+                    ", longitude=" + longitude +
+                    '}';
+        }
     }
 
     public static class LatLngBounds {

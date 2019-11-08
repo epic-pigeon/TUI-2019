@@ -17,6 +17,10 @@ public class Collection<T> extends ArrayList<T> {
         super();
     }
 
+    public Collection(java.util.Collection<? extends T> c) {
+        super(c);
+    }
+
     public boolean any(Predicate<T> predicate) {
         for (T val: this) {
             if (!predicate.test(val)) return false;
@@ -65,6 +69,7 @@ public class Collection<T> extends ArrayList<T> {
     }
 
     public Collection<T> qsort(Comparator<T> comparator) {
+        //System.out.println(this);
         if (size() < 2) return this;
         Collection<T> newCollection = new Collection<>();
         T pivot = get(0);

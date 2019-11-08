@@ -1,5 +1,7 @@
 package Problem_1;
 
+import Problem_1.linkerninghan.LinKernighan;
+import Problem_1.linkerninghan.Point;
 import Problem_4.Collection;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,11 +15,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Controller implements Initializable {
+    public static final int ITERATIONS = 100;
+
     //1, 2, 2, 1, 10.1, 14.1
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -39,9 +48,54 @@ public class Controller implements Initializable {
     ) {
         double[] a = calculate(focusDistance, photoCensorHeight, photoCensorWidth, height);
         invokeMapWindow(
-                calculatePhotoCoords(a[0], a[1], fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge), fieldHeight, fieldWidth, southWest, diameter
+                calculateRoute(a[0], a[1], fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge), fieldHeight, fieldWidth, southWest, diameter
         );
 
+    }
+
+    public static class Data {
+        private double[][] route;
+        private double fieldHeight, fieldWidth, diameter;
+        private MapView.LatLng southWest;
+
+        public Data(double[][] route, double fieldHeight, double fieldWidth, double diameter, MapView.LatLng southWest) {
+            this.route = route;
+            this.fieldHeight = fieldHeight;
+            this.fieldWidth = fieldWidth;
+            this.diameter = diameter;
+            this.southWest = southWest;
+        }
+
+        public double[][] getRoute() {
+            return route;
+        }
+
+        public double getFieldHeight() {
+            return fieldHeight;
+        }
+
+        public double getFieldWidth() {
+            return fieldWidth;
+        }
+
+        public double getDiameter() {
+            return diameter;
+        }
+
+        public MapView.LatLng getSouthWest() {
+            return southWest;
+        }
+
+        @Override
+        public String toString() {
+            return "Data{" +
+                    "route=" + Arrays.deepToString(route) +
+                    ", fieldHeight=" + fieldHeight +
+                    ", fieldWidth=" + fieldWidth +
+                    ", diameter=" + diameter +
+                    ", southWest=" + southWest +
+                    '}';
+        }
     }
 
     public static double calculateCharge(double[][] route, double chargePerPhoto, double chargePerMeter) {
@@ -60,6 +114,94 @@ public class Controller implements Initializable {
 
     private static double sqr(double q) {
         return q * q;
+    }
+
+    public static void save(File file, Data data) {
+        try {
+            double[][] coords = data.getRoute();
+            byte[] toWrite = new byte[coords.length * 16 + 40];
+            for (int i = 0; i < coords.length; i++) {
+                for (int j = 0; j < 2; j++) {
+                    for (int k = 0; k < 8; k++) {
+                        toWrite[i * 16 + j * 8 + k] = (byte) ((byte) (Double.doubleToLongBits(coords[i][j]) >>> k*8) & 0xFF);
+                    }
+                }
+            }
+            for (int i = 0; i < 8; i++) {
+                toWrite[coords.length * 16 + i] = (byte) ((byte) (Double.doubleToLongBits(data.getFieldHeight()) >>> i*8) & 0xFF);
+            }
+            for (int i = 0; i < 8; i++) {
+                toWrite[coords.length * 16 + 8 + i] = (byte) ((byte) (Double.doubleToLongBits(data.getFieldWidth()) >>> i*8) & 0xFF);
+            }
+            for (int i = 0; i < 8; i++) {
+                toWrite[coords.length * 16 + 16 + i] = (byte) ((byte) (Double.doubleToLongBits(data.getDiameter()) >>> i*8) & 0xFF);
+            }
+            for (int i = 0; i < 8; i++) {
+                toWrite[coords.length * 16 + 24 + i] = (byte) ((byte) (Double.doubleToLongBits(data.getSouthWest().getLatitude()) >>> i*8) & 0xFF);
+            }
+            for (int i = 0; i < 8; i++) {
+                toWrite[coords.length * 16 + 32 + i] = (byte) ((byte) (Double.doubleToLongBits(data.getSouthWest().getLongitude()) >>> i*8) & 0xFF);
+            }
+            Files.write(file.toPath(), toWrite);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Data read(File file) {
+        try {
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            double[][] coords = new double[(bytes.length - 40) / 16][];
+            for (int i = 0; i < (bytes.length - 40) / 16; i++) {
+                double[] point = new double[2];
+                for (int j = 0; j < 2; j++) {
+                    long num = 0;
+                    for (int k = 0; k < 8; k++) {
+                        byte aByte = bytes[i * 16 + j * 8 + k];
+                        num |= ((long) aByte & 0xFF) << k*8;
+                    }
+                    point[j] = Double.longBitsToDouble(num);
+                }
+                coords[i] = point;
+            }
+            long fieldHeight = 0;
+            for (int i = 0; i < 8; i++) {
+                byte aByte = bytes[bytes.length - 40 + i];
+                fieldHeight |= ((long) aByte & 0xFF) << i*8;
+            }
+            long fieldWidth = 0;
+            for (int i = 0; i < 8; i++) {
+                byte aByte = bytes[bytes.length - 32 + i];
+                fieldWidth |= ((long) aByte & 0xFF) << i*8;
+            }
+            long diameter = 0;
+            for (int i = 0; i < 8; i++) {
+                byte aByte = bytes[bytes.length - 24 + i];
+                diameter |= ((long) aByte & 0xFF) << i*8;
+            }
+            long latitude = 0;
+            for (int i = 0; i < 8; i++) {
+                byte aByte = bytes[bytes.length - 16 + i];
+                latitude |= ((long) aByte & 0xFF) << i*8;
+            }
+            long longitude = 0;
+            for (int i = 0; i < 8; i++) {
+                byte aByte = bytes[bytes.length - 8 + i];
+                longitude |= ((long) aByte & 0xFF) << i*8;
+            }
+            return new Data(
+                    coords,
+                    Double.longBitsToDouble(fieldHeight),
+                    Double.longBitsToDouble(fieldWidth),
+                    Double.longBitsToDouble(diameter),
+                    new MapView.LatLng(
+                            Double.longBitsToDouble(latitude),
+                            Double.longBitsToDouble(longitude)
+                    )
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -155,6 +297,31 @@ public class Controller implements Initializable {
         }
     }*/
 
+    public static double[][] calculateRoute(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
+        Collection<Point> points = new Collection<>(calculatePhotoCoords(photoHeight, photoWidth, fieldHeight, fieldWidth, chargePerMeter, chargePerPhoto, possibleCharge))
+                .map(arr -> new Point(arr[0], arr[1]));
+        int maxLength = (int) (possibleCharge / chargePerPhoto);
+        if (points.size() > maxLength) {
+            points = new Collection<>(points.subList(0, maxLength));
+        }
+        LinKernighan bestResult = new LinKernighan(points);
+        for (int i = 0; i < ITERATIONS; i++) {
+            LinKernighan lk = new LinKernighan(points);
+            lk.runAlgorithm();
+            if (lk.getDistance() < bestResult.getDistance()) {
+                bestResult.tour = lk.tour.clone();
+            }
+        }
+        double[][] result = new double[points.size()][];
+        for (int i = 0; i < points.size(); i++) {
+            result[i] = new double[]{
+                    points.get(bestResult.tour[i]).getX(),
+                    points.get(bestResult.tour[i]).getY()
+            };
+        }
+        return result;
+    }
+
     public static double[][] calculatePhotoCoords(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
         Collection<double[]> result = new Collection<>();
         Collection<double[]> rows = new Collection<>(
@@ -163,7 +330,10 @@ public class Controller implements Initializable {
         //System.out.println(rows.toString(double[].class));
         while ((rows = rows.filter(val -> val[2] < fieldHeight)).size() > 0) {
             //System.out.println(rows.toString(double[].class));
-            double[] toFill = rows.qsort(Comparator.comparingDouble(o1 -> o1[2])).get(0);
+            double[] toFill =
+                    rows.qsort(Comparator.comparingDouble(o1 -> o1[2])).get(0)
+                    //rows.get(0)
+                    ;
             //System.out.println(Arrays.toString(toFill));
             int index = rows.indexOf(toFill);
             int[] splitRes = splitRow(toFill[1], photoHeight, photoWidth);
@@ -196,10 +366,6 @@ public class Controller implements Initializable {
         }
         //System.out.println(result);
         return result.array(double[].class);
-    }
-
-    public static double[][] sortCoords(double[][] photoCoords) {
-        return null;
     }
 
     private static int[] splitRow(double length, double __l1, double __l2) {
@@ -405,7 +571,7 @@ public class Controller implements Initializable {
         }
     }
 
-    private static void invokeMapWindow(
+    public static void invokeMapWindow(
             double[][] route, double height, double width, MapView.LatLng southWest, double diameter
     ) {
         try {
