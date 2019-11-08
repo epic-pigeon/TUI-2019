@@ -571,6 +571,16 @@ public class Controller implements Initializable {
         }
     }
 
+    public static void invokeMapWindow(Data data) {
+        invokeMapWindow(
+                data.getRoute(),
+                data.getFieldHeight(),
+                data.getFieldWidth(),
+                data.getSouthWest(),
+                data.getDiameter()
+        );
+    }
+
     public static void invokeMapWindow(
             double[][] route, double height, double width, MapView.LatLng southWest, double diameter
     ) {

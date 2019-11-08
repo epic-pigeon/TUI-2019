@@ -2,6 +2,8 @@ package Menu;
 
 import Problem_1.MapView;
 import Problem_4.CanvasFX;
+import com.sun.javaws.progress.Progress;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -122,7 +124,7 @@ public class Controller implements Initializable {
 
 
     private void startFirst(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
+        /*Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
         primaryStage.setTitle("Enter the data");
         primaryStage.setScene(new Scene(root));
         primaryStage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
@@ -183,6 +185,13 @@ public class Controller implements Initializable {
                     Float.valueOf(textFields.get(10).getText()),
                     Float.valueOf(textFields.get(11).getText())
             );
+        });*/
+        Platform.runLater(() -> {
+            try {
+                new Problem_1.Main().start(primaryStage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 }
