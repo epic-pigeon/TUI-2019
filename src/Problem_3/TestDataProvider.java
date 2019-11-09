@@ -18,6 +18,18 @@ public class TestDataProvider {
             try {
                 images.add(ImageIO.read(file));
             } catch (IOException e) {
+                //throw new UncheckedIOException(e);
+            }
+        }
+        return images;
+    }
+
+    public static List<BufferedImage> getImages(List<File> imgNames) {
+        List<BufferedImage> images = new ArrayList<>();
+        for (File file : imgNames) {
+            try {
+                images.add(ImageIO.read(file));
+            } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         }

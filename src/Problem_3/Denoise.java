@@ -51,9 +51,9 @@ public class Denoise {
         PhotoTransformer photoTransformer = new PhotoTransformer();
         String POSITIONS_PATH = "";
         List<String> IMG_NAMES = new ArrayList<>();
-        String IMG_DIR = "src/Problem_3/resources/";
+       // String IMG_DIR = "src/Problem_3/resources/";
         String RESULT_DIR = "src/Problem_3/resources/tmp_result/";
-
+        List<File> kar = new ArrayList<>();
         boolean fl = true;
         for (File file: files){
             if (fl){
@@ -64,12 +64,13 @@ public class Denoise {
                 }
             }
             IMG_NAMES.add(file.getName());
+            kar.add(file);
         }
 
 
         List<ImagePosition> imagePositions = getImagePositions(POSITIONS_PATH, IMG_NAMES);
 
-        BufferedImage result = photoTransformer.cropImage(getImages(IMG_DIR, IMG_NAMES), imagePositions);
+        BufferedImage result = photoTransformer.cropImage(getImages(kar), imagePositions);
 
         if (!new File(RESULT_DIR).exists()) {
             new File(RESULT_DIR).mkdirs();
