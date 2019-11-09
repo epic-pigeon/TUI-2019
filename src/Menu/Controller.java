@@ -96,7 +96,7 @@ public class Controller implements Initializable {
                 case 7:
                     stage.setTitle("Помощь");
                     root = FXMLLoader.load(getClass().getClassLoader().getResource("Help/ui.fxml"));
-                    stage.getIcons().add(new Image("/Menu/drone.png"));
+                    stage.getIcons().add(new Image("/Menu/dronePhoto.png"));
                     stage.setScene(new Scene(root, 625, 600));
                     break;
             }
