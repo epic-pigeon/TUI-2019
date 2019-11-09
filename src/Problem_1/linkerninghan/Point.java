@@ -43,5 +43,7 @@ public class Point {
         return this.y;
     }
 
-
+    public double[] toArray() {
+        return new double[] {x, y};
+    }
 }

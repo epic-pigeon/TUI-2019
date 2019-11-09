@@ -7,9 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -147,6 +145,13 @@ public class Main extends Application {
             }
     );
 
+    private void showAlert(String message) {
+        Dialog<Void> alert = new Dialog<>();
+        alert.getDialogPane().setContentText(message);
+        alert.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        alert.showAndWait();
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -212,23 +217,27 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(pane));
 
         okBtn.setOnAction(event -> {
-            Controller.createMapWindow(
-                    Float.valueOf(textFields.get(0).getText()),
-                    Float.valueOf(textFields.get(1).getText()),
-                    Float.valueOf(textFields.get(2).getText()),
-                    Float.valueOf(textFields.get(3).getText()),
-                    Float.valueOf(textFields.get(4).getText()),
-                    Float.valueOf(textFields.get(5).getText()),
-                    new MapView.LatLng(
-                            Float.valueOf(textFields.get(6).getText()),
-                            Float.valueOf(textFields.get(7).getText())
-                    ),
-                    //new MapView.LatLng(50.466977, 31.211438), 0.01
-                    Float.valueOf(textFields.get(8).getText()),
-                    Float.valueOf(textFields.get(9).getText()),
-                    Float.valueOf(textFields.get(10).getText()),
-                    Float.valueOf(textFields.get(11).getText())
-            );
+            if (Float.valueOf(textFields.get(9).getText()) > Float.valueOf(textFields.get(11).getText())) {
+                showAlert("Cannot take a single photo");
+            } else {
+                Controller.createMapWindow(
+                        Float.valueOf(textFields.get(0).getText()),
+                        Float.valueOf(textFields.get(1).getText()),
+                        Float.valueOf(textFields.get(2).getText()),
+                        Float.valueOf(textFields.get(3).getText()),
+                        Float.valueOf(textFields.get(4).getText()),
+                        Float.valueOf(textFields.get(5).getText()),
+                        new MapView.LatLng(
+                                Float.valueOf(textFields.get(6).getText()),
+                                Float.valueOf(textFields.get(7).getText())
+                        ),
+                        //new MapView.LatLng(50.466977, 31.211438), 0.01
+                        Float.valueOf(textFields.get(8).getText()),
+                        Float.valueOf(textFields.get(9).getText()),
+                        Float.valueOf(textFields.get(10).getText()),
+                        Float.valueOf(textFields.get(11).getText())
+                );
+            }
                /*double[] photoBounds = Controller.calculate(
                        Float.valueOf(textFields.get(0).getText()),
                        Float.valueOf(textFields.get(1).getText()),
@@ -245,50 +254,54 @@ public class Main extends Application {
                );*/
         });
         saveBtn.setOnAction(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Choose a file to save to");
-            chooser.getExtensionFilters().add(drsFilter);
-            File file = chooser.showSaveDialog(primaryStage);
-            double[] a = Controller.calculate(
-                    Float.valueOf(textFields.get(0).getText()),
-                    Float.valueOf(textFields.get(1).getText()),
-                    Float.valueOf(textFields.get(2).getText()),
-                    Float.valueOf(textFields.get(3).getText())
-            );
-            System.out.println(file);
-            Controller.save(file,
-                    new Controller.Data(
-                            Controller.calculateRoute(
-                                    a[0], a[1],
-                                    Float.valueOf(textFields.get(4).getText()),
-                                    Float.valueOf(textFields.get(5).getText()),
-                                    Float.valueOf(textFields.get(9).getText()),
-                                    Float.valueOf(textFields.get(10).getText()),
-                                    Float.valueOf(textFields.get(11).getText())
-                            ),
-                            Float.valueOf(textFields.get(4).getText()),
-                            Float.valueOf(textFields.get(5).getText()),
-                            Float.valueOf(textFields.get(8).getText()),
-                            new MapView.LatLng(
-                                    Float.valueOf(textFields.get(6).getText()),
-                                    Float.valueOf(textFields.get(7).getText())
-                            )
-                    )
-            );
+            if (Float.valueOf(textFields.get(9).getText()) > Float.valueOf(textFields.get(11).getText())) {
+                showAlert("Cannot take a single photo");
+            } else {
+                FileChooser chooser = new FileChooser();
+                chooser.setTitle("Choose a file to save to");
+                chooser.getExtensionFilters().add(drsFilter);
+                File file = chooser.showSaveDialog(primaryStage);
+                double[] a = Controller.calculate(
+                        Float.valueOf(textFields.get(0).getText()),
+                        Float.valueOf(textFields.get(1).getText()),
+                        Float.valueOf(textFields.get(2).getText()),
+                        Float.valueOf(textFields.get(3).getText())
+                );
+                System.out.println(file);
+                Controller.save(file,
+                        new Controller.Data(
+                                Controller.calculateRoute(
+                                        a[0], a[1],
+                                        Float.valueOf(textFields.get(4).getText()),
+                                        Float.valueOf(textFields.get(5).getText()),
+                                        Float.valueOf(textFields.get(9).getText()),
+                                        Float.valueOf(textFields.get(10).getText()),
+                                        Float.valueOf(textFields.get(11).getText())
+                                ),
+                                Float.valueOf(textFields.get(4).getText()),
+                                Float.valueOf(textFields.get(5).getText()),
+                                Float.valueOf(textFields.get(8).getText()),
+                                new MapView.LatLng(
+                                        Float.valueOf(textFields.get(6).getText()),
+                                        Float.valueOf(textFields.get(7).getText())
+                                )
+                        )
+                );
+            }
         });
         loadBtn.setOnAction(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Choose a file to load");
-            chooser.getExtensionFilters().add(drsFilter);
-            File file = chooser.showOpenDialog(primaryStage);
-            Controller.Data data = Controller.read(file);
-            Controller.invokeMapWindow(
-                    data.getRoute(),
-                    data.getFieldHeight(),
-                    data.getFieldWidth(),
-                    data.getSouthWest(),
-                    data.getDiameter()
-            );
+                FileChooser chooser = new FileChooser();
+                chooser.setTitle("Choose a file to load");
+                chooser.getExtensionFilters().add(drsFilter);
+                File file = chooser.showOpenDialog(primaryStage);
+                Controller.Data data = Controller.read(file);
+                Controller.invokeMapWindow(
+                        data.getRoute(),
+                        data.getFieldHeight(),
+                        data.getFieldWidth(),
+                        data.getSouthWest(),
+                        data.getDiameter()
+                );
         });
     }
 

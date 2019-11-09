@@ -13,7 +13,7 @@ public class LinKernighan {
     private int size;
 
     // The current tour solution
-    public int[] tour;
+    private int[] tour;
 
     // The distance table
     private double[][] distanceTable;
@@ -584,5 +584,14 @@ public class LinKernighan {
             }
         }
         return str;
+    }
+
+    public int[] getTour() {
+        return tour;
+    }
+
+    public void setTour(int[] tour) {
+        this.size = tour.length;
+        this.tour = tour;
     }
 }

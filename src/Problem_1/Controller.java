@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
@@ -309,17 +310,39 @@ public class Controller implements Initializable {
             LinKernighan lk = new LinKernighan(points);
             lk.runAlgorithm();
             if (lk.getDistance() < bestResult.getDistance()) {
-                bestResult.tour = lk.tour.clone();
+                bestResult.setTour(lk.getTour().clone());
             }
         }
-        double[][] result = new double[points.size()][];
-        for (int i = 0; i < points.size(); i++) {
-            result[i] = new double[]{
-                    points.get(bestResult.tour[i]).getX(),
-                    points.get(bestResult.tour[i]).getY()
-            };
+        while (bestResult.getDistance() * chargePerMeter + points.size() * chargePerPhoto > possibleCharge) {
+            points = new Collection<>(points.subList(0, points.size() - 1));
+            if (points.size() > 1) {
+                for (int i = 0; i < ITERATIONS; i++) {
+                    LinKernighan lk = new LinKernighan(points);
+                    lk.runAlgorithm();
+                    if (lk.getDistance() < bestResult.getDistance()) {
+                        bestResult.setTour(lk.getTour().clone());
+                    }
+                }
+            } else break;
         }
-        return result;
+        if (points.size() > 1) {
+            double[][] result = new double[points.size()][];
+            for (int i = 0; i < points.size(); i++) {
+                result[i] = new double[]{
+                        points.get(bestResult.getTour()[i]).getX(),
+                        points.get(bestResult.getTour()[i]).getY()
+                };
+            }
+            return result;
+        } else return new double[][] {
+                new double[] {
+                        points.get(0).getX(), points.get(0).getY()
+                }
+        };
+    }
+
+    private static double length(double[] _1, double[] _2) {
+        return Math.sqrt((_1[0] - _2[0]) * (_1[0] - _2[0]) + (_1[1] - _2[1]) * (_1[1] - _2[1]));
     }
 
     public static double[][] calculatePhotoCoords(double photoHeight, double photoWidth, double fieldHeight, double fieldWidth, double chargePerMeter, double chargePerPhoto, double possibleCharge) {
@@ -582,9 +605,16 @@ public class Controller implements Initializable {
     }
 
     public static void invokeMapWindow(
-            double[][] route, double height, double width, MapView.LatLng southWest, double diameter
+            double[][] _route, double height, double width, MapView.LatLng southWest, double diameter
     ) {
         try {
+            double[][] newRoute = new double[_route.length + 1][];
+            for (int i = 0; i < _route.length; i++) {
+                newRoute[i] = _route[i];
+            }
+            newRoute[_route.length] = newRoute[0];
+            final double[][] route = newRoute;
+
             FXMLLoader loader = new FXMLLoader(
                     Controller.class.getResource("mapwindow.fxml")
             );
