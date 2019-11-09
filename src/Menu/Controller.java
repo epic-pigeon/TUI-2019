@@ -1,28 +1,22 @@
 package Menu;
 
-import Problem_1.MapView;
+import Problem_1.Main;
 import Problem_4.CanvasFX;
-import com.sun.javaws.progress.Progress;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -94,16 +88,16 @@ public class Controller implements Initializable {
                     stage.setScene(new Scene(root, 1450, 1000));
                     break;
                 case 6:
-                    stage.setTitle("Полив полей");
+                    stage.setTitle("Полив поля");
                     root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_6/ui.fxml"));
                     stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
                     stage.setScene(new Scene(root, 1066, 850));
                     break;
                 case 7:
                     stage.setTitle("Помощь");
-                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Problem_6/ui.fxml"));
-                    stage.getIcons().add(new Image("/resources/cloud-storage-uploading-option.png"));
-                    stage.setScene(new Scene(root, 1066, 850));
+                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Help/ui.fxml"));
+                    stage.getIcons().add(new Image("/Menu/dronePhoto.png"));
+                    stage.setScene(new Scene(root, 625, 600));
                     break;
             }
             stage.show();
@@ -124,6 +118,13 @@ public class Controller implements Initializable {
 
 
     private void startFirst(Stage primaryStage) throws IOException {
+        Platform.runLater(() -> {
+            try {
+                new Main().start(primaryStage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         /*Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
         primaryStage.setTitle("Enter the data");
         primaryStage.setScene(new Scene(root));

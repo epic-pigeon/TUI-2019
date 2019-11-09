@@ -1,7 +1,6 @@
 package Problem_4;
 
 import Problem_4.TLogParser.TLogPoint;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -116,15 +115,15 @@ public class CanvasFX extends Application implements Initializable {
             e.printStackTrace();
         }
 
-        minX = new AtomicReference<>(metersFromCoords(coordinates.get(0).getLongitude(), coordinates.get(0).getLatitude()));
+        minX = new AtomicReference<>(metersFromCords(coordinates.get(0).getLongitude(), coordinates.get(0).getLatitude()));
         minY = new AtomicReference<>(metersFromLatitude(90 - coordinates.get(0).getLatitude()));
         maxX = new AtomicReference<>(0D);
         maxY = new AtomicReference<>(0D);
 
         for (TLogPoint kar : coordinates) {
-            minX.set(Math.min(minX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            minX.set(Math.min(minX.get(), metersFromCords(kar.getLongitude(), kar.getLatitude())));
             minY.set(Math.min(minY.get(), metersFromLatitude(90 - kar.getLatitude())));
-            maxX.set(Math.max(maxX.get(), metersFromCoords(kar.getLongitude(), kar.getLatitude())));
+            maxX.set(Math.max(maxX.get(), metersFromCords(kar.getLongitude(), kar.getLatitude())));
             maxY.set(Math.max(maxY.get(), metersFromLatitude(90 - kar.getLatitude())));
         }
     }
@@ -140,7 +139,7 @@ public class CanvasFX extends Application implements Initializable {
             double altitude = tLogPoint.getAltitude();
             double x = tLogPoint.getLongitude(),
                     y = 90 - tLogPoint.getLatitude();
-            double imgX = delta + (metersFromCoords(x, 90-y) - minX.get()) * scale,
+            double imgX = delta + (metersFromCords(x, 90-y) - minX.get()) * scale,
                     imgY = delta + (metersFromLatitude(y) - minY.get()) * scale;
             double imgWidth = imgW * altitude / 325, imgHeight = imgH * altitude / 325;
             //System.out.println(tLogPoint.getYaw());
@@ -207,11 +206,8 @@ public class CanvasFX extends Application implements Initializable {
         return deg / 90 / 4 * R;
     }
 
-    private static double metersFromCoords(double lon, double lat) {
-        return (lon / 90.0 / 4 * R)
-                * Math.sin((90.0 - lat) / 90.0)
-
-                ;
+    private static double metersFromCords(double lon, double lat) {
+        return (lon / 90.0 / 4 * R) * Math.sin((90.0 - lat) / 90.0);
     }
 
 
