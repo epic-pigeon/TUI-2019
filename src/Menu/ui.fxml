@@ -116,7 +116,7 @@
         </VBox>
         <ImageView fitHeight="500.0" fitWidth="500.0" layoutX="430.0" layoutY="120.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../resources/dronePhoto.png" />
+                <Image url="@dronePhoto.png" />
             </image>
         </ImageView>
     </children>
