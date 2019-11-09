@@ -132,6 +132,7 @@ public class Controller implements Initializable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        });
         /*Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
         primaryStage.setTitle("Enter the data");
         primaryStage.setScene(new Scene(root));
