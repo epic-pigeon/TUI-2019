@@ -252,7 +252,7 @@ public class Controller implements Initializable {
 
                 VBox vBox2 = new VBox();
                 ImageView iv2 = new ImageView();
-                iv2.setImage(processedImgPro);
+                iv2.setImage(processedImgContours);
                 iv2.setPreserveRatio(true);
                 iv2.setSmooth(true);
                 iv2.setCache(true);
@@ -262,7 +262,7 @@ public class Controller implements Initializable {
 
                 VBox vBox3 = new VBox();
                 ImageView iv3 = new ImageView();
-                iv3.setImage(processedImgContours);
+                iv3.setImage(processedImgPro);
                 iv3.setPreserveRatio(true);
                 iv3.setSmooth(true);
                 iv3.setCache(true);

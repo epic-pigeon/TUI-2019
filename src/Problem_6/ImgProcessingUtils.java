@@ -43,6 +43,10 @@ public class ImgProcessingUtils {
     }
 
     public static Mat filterByRedColorEmpirically(Mat srcMat) {
+        final double redImportance = 1;
+        final double blueImportance = 0.15;
+        final double threshold = 0.65;
+
         BufferedImage srcImg = BlurService.getImage(srcMat);
         WritableImage srcFxImg = SwingFXUtils.toFXImage(srcImg, null);
 
@@ -51,7 +55,7 @@ public class ImgProcessingUtils {
         for (int x = 0; x < srcImg.getWidth(); ++x) {
             for (int y = 0; y < srcImg.getHeight(); ++y) {
                 javafx.scene.paint.Color color = srcFxImg.getPixelReader().getColor(x, y);
-                boolean pixelMatches = color.getRed() + (1 - color.getBlue()) * 0.15 >= 0.65;
+                boolean pixelMatches = color.getRed() * redImportance + (1 - color.getBlue()) * blueImportance >= threshold;
                 filteredImg.setRGB(x, y, pixelMatches ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
             }
         }
