@@ -176,12 +176,15 @@ public class Main extends Application {
         vbox.setPadding(new Insets(10, 10, 10, 10));
 
 
+        System.out.println("kar");
         for (Field field : fields) {
             Label label = new Label(field.getName());
             labels.add(label);
             TextField temp = new TextField();
             if (field.getDefaultValue() != null)
                 temp.setText(field.getDefaultValue());
+            else
+                temp.setText("");
             temp.addEventFilter(KeyEvent.KEY_TYPED, keyEvent -> {
                 if (!field.verifyInput(temp.getText() + keyEvent.getCharacter())) keyEvent.consume();
             });
@@ -217,8 +220,8 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(pane));
 
         okBtn.setOnAction(event -> {
-            if (Float.valueOf(textFields.get(9).getText()) > Float.valueOf(textFields.get(11).getText())) {
-                showAlert("Cannot take a single photo");
+            if (!checkFields()) {
+                showAlert("Bad input");
             } else {
                 Controller.createMapWindow(
                         Float.valueOf(textFields.get(0).getText()),
@@ -254,8 +257,8 @@ public class Main extends Application {
                );*/
         });
         saveBtn.setOnAction(event -> {
-            if (Float.valueOf(textFields.get(9).getText()) > Float.valueOf(textFields.get(11).getText())) {
-                showAlert("Cannot take a single photo");
+            if (!checkFields()) {
+                showAlert("Bad input");
             } else {
                 FileChooser chooser = new FileChooser();
                 chooser.setTitle("Choose a file to save to");
@@ -305,6 +308,12 @@ public class Main extends Application {
         });
     }
 
+    private boolean checkFields() {
+        for (int i = 0; i < fields.size(); i++) {
+            if (!fields.get(i).verifyInput(textFields.get(i).getText())) return false;
+        }
+        return Float.valueOf(textFields.get(9).getText()) <= Float.valueOf(textFields.get(11).getText());
+    }
 
     public static void main(String[] args) {
         launch(args);

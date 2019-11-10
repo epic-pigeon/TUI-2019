@@ -118,13 +118,13 @@ public class Controller implements Initializable {
 
 
     private void startFirst(Stage primaryStage) throws IOException {
-        Platform.runLater(() -> {
+        /*Platform.runLater(() -> {
             try {
                 new Main().start(primaryStage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        });*/
         /*Parent root = FXMLLoader.load(getClass().getResource("/Problem_1/sample.fxml"));
         primaryStage.setTitle("Enter the data");
         primaryStage.setScene(new Scene(root));
