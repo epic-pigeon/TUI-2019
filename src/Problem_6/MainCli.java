@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class MainCli {
 
-    private static final String IMG_PATH = "src/Problem_6/resources/field2.jpg";
+    private static final String IMG_PATH = "src/Problem_6/resources/processed_pro.jpg";
 
     public static void main(String[] args) throws Exception {
         nu.pattern.OpenCV.loadShared();
@@ -18,21 +18,23 @@ public class MainCli {
     }
 
     private static void processImage() throws IOException {
-        Mat srcMat = BlurService.getMat(ImageIO.read(new File(IMG_PATH)));
-        ImgProcessor imgProcessor = new ImgProcessor(IMG_PATH);
+        File srcFile = new File(IMG_PATH);
+        Mat srcMat = BlurService.getMat(ImageIO.read(srcFile));
+        ImgProcessor imgProcessor = new ImgProcessor(ImageIO.read(srcFile));
 
         // Area threshold can be set as a fixed value or relatively to image size.
         final double contourAreaThreshold = srcMat.size().width * srcMat.size().height * 0.005;
 
         // Turn on saving intermediate files if you want to see how each image processing stage works.
         imgProcessor.setIntermediateSaving(true)
-                .process("color-emp", ImgProcessingUtils::filterByGreenishColorEmpirically)
+                .setSavingDirectory("src/Problem_6/resources/tmp_result")
+                .process("color-emp", ImgProcessingUtils::filterByRedColorEmpirically)
                 .process("blur", ImgProcessingUtils::blur)
                 .process("thr", ImgProcessingUtils::brightnessThreshold)
                 .process("top-contours-thr", mat -> ImgProcessingUtils.topContoursOverImage(mat,
                         contourAreaThreshold, srcMat));
 
         ImageIO.write(BlurService.getImage(imgProcessor.getMat()), "JPG",
-                new File(imgProcessor.generateFileName()));
+                new File(imgProcessor.generateFilePath()));
     }
 }

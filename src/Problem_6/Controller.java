@@ -247,10 +247,12 @@ public class Controller implements Initializable {
                 vBox.getChildren().addAll(iv, new Label(fileImg.getName()));
                 vBox.setPadding(new Insets(1, 1, 1, 1));
 
-                Image processedImg = processingPhoto(image, filePath);
+                Image processedImgPro = processingPhotoPro(image);
+                Image processedImgContours = processingPhoto(processedImgPro, image);
+
                 VBox vBox2 = new VBox();
                 ImageView iv2 = new ImageView();
-                iv2.setImage(processedImg);
+                iv2.setImage(processedImgPro);
                 iv2.setPreserveRatio(true);
                 iv2.setSmooth(true);
                 iv2.setCache(true);
@@ -258,10 +260,9 @@ public class Controller implements Initializable {
                 vBox2.getChildren().addAll(iv2, new Label(fileImg.getName()));
                 vBox2.setPadding(new Insets(1, 1, 1, 1));
 
-                Image processedImg2 = processingPhotoPro(image);
                 VBox vBox3 = new VBox();
                 ImageView iv3 = new ImageView();
-                iv3.setImage(processedImg2);
+                iv3.setImage(processedImgContours);
                 iv3.setPreserveRatio(true);
                 iv3.setSmooth(true);
                 iv3.setCache(true);
@@ -277,21 +278,23 @@ public class Controller implements Initializable {
         });
     }
 
-    private Image processingPhoto(Image image, String filePath) {
+    private Image processingPhoto(Image processedImage, Image originalImage) {
         nu.pattern.OpenCV.loadShared();
-        Mat srcMat = BlurService.getMat(SwingFXUtils.fromFXImage(image, null));
-        ImgProcessor imgProcessor = new ImgProcessor(SwingFXUtils.fromFXImage(image, null), filePath);
+        BufferedImage bufferedImage = getRgbBufferedImageFromFx(processedImage);
+        Mat srcMat = BlurService.getMat(bufferedImage);
+        ImgProcessor imgProcessor = new ImgProcessor(bufferedImage);
 
         // Area threshold can be set as a fixed value or relatively to image size.
         final double contourAreaThreshold = srcMat.size().width * srcMat.size().height * 0.005;
 
         // Turn on saving intermediate files if you want to see how each image processing stage works.
         imgProcessor.setIntermediateSaving(false)
-                .process("color-emp", ImgProcessingUtils::filterByGreenishColorEmpirically)
+//                .setSavingDirectory("tmp_result")
+                .process("color-emp", ImgProcessingUtils::filterByRedColorEmpirically)
                 .process("blur", ImgProcessingUtils::blur)
                 .process("thr", ImgProcessingUtils::brightnessThreshold)
                 .process("top-contours-thr", mat -> ImgProcessingUtils.topContoursOverImage(mat,
-                        contourAreaThreshold, srcMat));
+                        contourAreaThreshold, BlurService.getMat(getRgbBufferedImageFromFx(originalImage))));
 
         return SwingFXUtils.toFXImage(BlurService.getImage(imgProcessor.getMat()), null);
     }
@@ -376,5 +379,18 @@ public class Controller implements Initializable {
                 ((toCheck.getRed() >= gradientFromStart.getRed()) && (toCheck.getRed() <= gradientFromEnd.getRed())) &&
                         ((toCheck.getGreen() >= gradientFromStart.getGreen()) && (toCheck.getGreen() <= gradientFromEnd.getGreen())) &&
                         ((toCheck.getBlue() >= gradientFromStart.getBlue()) && (toCheck.getBlue() <= gradientFromEnd.getBlue()));
+    }
+
+    /**
+     * Needed because {@link SwingFXUtils#fromFXImage} method converts only to RGBA BufferedImage.
+     *
+     * @see <a href="http://google.com">https://bugs.openjdk.java.net/browse/JDK-8119048</a>
+     */
+    private BufferedImage getRgbBufferedImageFromFx(Image fxImage) {
+        BufferedImage bufferedImg = SwingFXUtils.fromFXImage(fxImage, null);
+        BufferedImage rgbImage = new BufferedImage(bufferedImg.getWidth(), bufferedImg.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+        rgbImage.getGraphics().drawImage(bufferedImg, 0, 0, null);
+        return rgbImage;
     }
 }

@@ -38,6 +38,26 @@ public class ImgProcessingUtils {
         return BlurService.getMat(filteredImg);
     }
 
+    public static Mat identity(Mat srcMat) {
+        return srcMat;
+    }
+
+    public static Mat filterByRedColorEmpirically(Mat srcMat) {
+        BufferedImage srcImg = BlurService.getImage(srcMat);
+        WritableImage srcFxImg = SwingFXUtils.toFXImage(srcImg, null);
+
+        BufferedImage filteredImg = new BufferedImage(srcImg.getWidth(), srcImg.getHeight(), ColorSpace.TYPE_RGB);
+
+        for (int x = 0; x < srcImg.getWidth(); ++x) {
+            for (int y = 0; y < srcImg.getHeight(); ++y) {
+                javafx.scene.paint.Color color = srcFxImg.getPixelReader().getColor(x, y);
+                boolean pixelMatches = color.getRed() + (1 - color.getBlue()) * 0.15 >= 0.65;
+                filteredImg.setRGB(x, y, pixelMatches ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
+            }
+        }
+        return BlurService.getMat(filteredImg);
+    }
+
     /**
      * Performs Gaussian blur.
      *
@@ -59,7 +79,7 @@ public class ImgProcessingUtils {
      */
     public static Mat brightnessThreshold(Mat srcMat) {
         // Brightness threshold can be tuned.
-        Scalar grayStart = new Scalar(127, 127, 127);
+        Scalar grayStart = new Scalar(50, 50, 50);
         Scalar whiteEnd = new Scalar(255, 255, 255);
         Mat whiteFilteredMat = new Mat(srcMat.rows(), srcMat.cols(), srcMat.type());
         Core.inRange(srcMat, grayStart, whiteEnd, whiteFilteredMat);
