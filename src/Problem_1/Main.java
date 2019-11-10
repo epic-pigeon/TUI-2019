@@ -145,7 +145,7 @@ public class Main extends Application {
             }
     );
 
-    private void showAlert(String message) {
+    public static void showAlert(String message) {
         Dialog<Void> alert = new Dialog<>();
         alert.getDialogPane().setContentText(message);
         alert.getDialogPane().getButtonTypes().add(ButtonType.OK);

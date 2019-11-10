@@ -16,12 +16,16 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/Menu/ui.fxml"));
-        primaryStage.setTitle("Menu");
-        primaryStage.getIcons().add(new Image("/Menu/dronePhoto.png"));
-        //  root.setStyle("-fx-background-color:rgba(0, 255, 0 , 0.3)");
-        primaryStage.setScene(new Scene(root, 930, 500));
-        primaryStage.show();
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/Menu/ui.fxml"));
+            primaryStage.setTitle("Menu");
+            primaryStage.getIcons().add(new Image("/Menu/dronePhoto.png"));
+            //  root.setStyle("-fx-background-color:rgba(0, 255, 0 , 0.3)");
+            primaryStage.setScene(new Scene(root, 930, 500));
+            primaryStage.show();
+        } catch (Exception e) {
+            Problem_1.Main.showAlert(e.getMessage());
+        }
     }
 
 
