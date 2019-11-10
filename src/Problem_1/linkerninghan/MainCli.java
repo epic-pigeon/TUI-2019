@@ -31,7 +31,7 @@ public class MainCli {
             LinKernighan lk = new LinKernighan(coordinates);
             lk.runAlgorithm();
             if (lk.getDistance() < bestResult.getDistance()) {
-                bestResult.tour = lk.tour.clone();
+                bestResult.setTour(lk.getTour().clone());
             }
         }
         return bestResult;
