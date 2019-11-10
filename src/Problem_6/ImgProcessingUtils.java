@@ -112,7 +112,7 @@ public class ImgProcessingUtils {
         List<MatOfPoint> bestContours = areaToContour.stream().map(Pair::getValue).limit(bestContoursNumber)
                 .collect(Collectors.toList());
 //        Use fillPoly if you want to highlight inner part of contours as well.
-        Imgproc.fillPoly(outputMat, bestContours, new Scalar(255, 0, 0));
+        Imgproc.fillPoly(outputMat, bestContours, new Scalar(0, 0, 255));
 
         for (int contourIdx = 0; contourIdx < bestContours.size(); contourIdx++) {
             Imgproc.drawContours(outputMat, bestContours, contourIdx, new Scalar(255, 255, 255));

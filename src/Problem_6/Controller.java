@@ -300,7 +300,7 @@ public class Controller implements Initializable {
     }
 
     private Image processingPhotoPro(Image image) {
-        BufferedImage bufferedImage2 = SwingFXUtils.fromFXImage(image, null);
+        BufferedImage bufferedImage2 = getRgbBufferedImageFromFx(image);
         int width = (int) image.getWidth(), height = (int) image.getHeight();
         int h = 10, w = 10;
 
